@@ -2,9 +2,47 @@
 
 ## Issue 一覧と状態
 
-| Issue | タイトル | 依存 | 状態 |
-|-------|---------|------|------|
-| -     | -       | -    | -    |
+| Issue | タイトル | 依存 | 並列グループ | 状態 |
+|-------|---------|------|------------|------|
+| issue01 | 環境構築（package.json / tsconfig.json） | なし | Group 1 | 未着手 |
+| issue02 | gitService.ts — git コマンド共通層 | issue01 | Group 2 | 未着手 |
+| issue03 | sidebarProvider.ts — サイドバー TreeView | issue02 | Group 3 | 未着手 |
+| issue04 | blameDecoration.ts — Blame ゴーストテキスト | issue02 | Group 3 | 未着手 |
+| issue05 | historyPanel.ts — コミット履歴 + ファイル一覧 | issue02 | Group 3 | 未着手 |
+| issue06 | historyPanel.ts — ファイル履歴 + diff | issue05 | Group 4 | 未着手 |
+| issue07 | extension.ts 統合 + .vsix パッケージ化 | issue03, issue04, issue06 | Group 5 | 未着手 |
+
+---
+
+## 並列実行グループ
+
+```
+Group 1: issue01  （環境構築）
+    ↓
+Group 2: issue02  （gitService.ts）
+    ↓
+Group 3: issue03 ┐
+         issue04 ├── 並列実行可（Editable Files が重複しない）
+         issue05 ┘
+    ↓
+Group 4: issue06  （historyPanel.ts に追記、issue05と同ファイルのため逐次）
+    ↓
+Group 5: issue07  （extension.ts 統合 + vsix）
+```
+
+---
+
+## 依存関係
+
+```
+issue01
+  └── issue02
+        ├── issue03 ─────────────────────────────┐
+        ├── issue04 ─────────────────────────────┤
+        └── issue05                              │
+              └── issue06                        │
+                    └── issue07 ◄────────────────┘
+```
 
 ---
 
@@ -23,7 +61,15 @@
 
 ## ブランチ命名
 
-feature/issueXX-<short-name>
+| Issue | ブランチ名 |
+|-------|-----------|
+| issue01 | feature/issue01-env-setup |
+| issue02 | feature/issue02-git-service |
+| issue03 | feature/issue03-sidebar-provider |
+| issue04 | feature/issue04-blame-decoration |
+| issue05 | feature/issue05-history-panel-basic |
+| issue06 | feature/issue06-history-panel-diff |
+| issue07 | feature/issue07-extension-entry-vsix |
 
 ---
 
