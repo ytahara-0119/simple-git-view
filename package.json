@@ -1,0 +1,25 @@
+{
+  "name": "simple-git-view",
+  "displayName": "Simple Git View",
+  "description": "A simple VSCode extension to view git repository status, history, and diffs.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "commands": []
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.0.0"
+  }
+}
