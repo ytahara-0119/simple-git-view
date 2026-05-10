@@ -1,8 +1,9 @@
 # CLAUDE.md
 
 ## プロジェクト概要
-<!-- [要差し替え: Human が実施] プロジェクト名・概要・仕様書ファイル名をここに記述する -->
-本プロジェクトは ClamAV を利用した Python CLI スキャンツールである。
+<!-- [要差し替え←差し替え済み: Human が実施] プロジェクト名・概要・仕様書ファイル名をここに記述する -->
+本プロジェクトは VSCode 拡張機能 "Simple Git View" である。
+git リポジトリの状態・履歴・差分を表示特化で提供するシンプルなツール。
 仕様の正本は SPEC.md とする。
 
 ---
@@ -19,13 +20,14 @@
 ---
 
 ## 開発方針
-<!-- [要差し替え: Human が実施] 使用言語・フレームワーク・DB・ツールをプロジェクトに合わせて書き換える -->
+<!-- [要差し替え←差し替え済み: Human が実施] 使用言語・フレームワーク・DB・ツールをプロジェクトに合わせて書き換える -->
 
-- Python は uv で管理する
-- DB は SQLite を使用する
-- ORM は SQLAlchemy を使用する
-- CLI は Typer を使用する
-- ClamAV は subprocess 経由で呼び出す
+- 言語は TypeScript を使用する
+- VSCode Extension API を使用する
+- git 操作は child_process.execSync で直接実行する（外部ライブラリなし）
+- diff 表示は vscode.diff() を使用する
+- パッケージ管理は npm を使用する
+- 機能を足さない設計を原則とする（トグル・設定項目は原則設けない）
 
 ---
 
@@ -115,16 +117,17 @@ Agent(isolation="worktree", prompt="issues/issue03.md を実装")   ┘ 起動
 ---
 
 ## 実装優先順位
-<!-- [要差し替え: Human が実施] このプロジェクト固有の実装順序に書き換える -->
+<!-- [要差し替え←差し替え済み: Human が実施] このプロジェクト固有の実装順序に書き換える -->
 
-1. 環境構築（uv / SQLite / Typer / SQLAlchemy）
-2. scan（manual）
-3. scanner + parser
-4. DB保存
-5. directory対応
-6. plan構造
-7. collect
-8. preview / approve / execute
+1. 環境構築（tsconfig / package.json / ディレクトリ構成）
+2. gitService.ts（git コマンド実行・データ取得の共通層）
+3. sidebarProvider.ts（ブランチ名・変更ファイル一覧）
+4. blameDecoration.ts（Blame 常時表示）
+5. historyPanel.ts（コミット履歴 Webview）
+6. ファイル一覧表示（コミットクリック → 変更ファイル）
+7. ファイル履歴表示（ファイルクリック → そのファイルの履歴）
+8. 左右 diff 表示（履歴行クリック → vscode.diff()）
+9. .vsix パッケージ化・動作確認
 
 ---
 
