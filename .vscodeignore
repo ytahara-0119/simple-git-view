@@ -1,0 +1,11 @@
+src/
+tsconfig.json
+*.md
+.gitignore
+.git
+node_modules/
+.claude/
+agents/
+docs/
+issues/
+scripts/
