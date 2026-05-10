@@ -37,6 +37,9 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  // 5. 起動時にコミット履歴パネルを自動表示
+  HistoryPanel.show(cwd, context);
+
   context.subscriptions.push(treeView);
 }
 
