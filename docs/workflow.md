@@ -4,13 +4,14 @@
 
 | Issue | タイトル | 依存 | 並列グループ | 状態 |
 |-------|---------|------|------------|------|
-| issue01 | 環境構築（package.json / tsconfig.json） | なし | Group 1 | 未着手 |
-| issue02 | gitService.ts — git コマンド共通層 | issue01 | Group 2 | 未着手 |
-| issue03 | sidebarProvider.ts — サイドバー TreeView | issue02 | Group 3 | 未着手 |
-| issue04 | blameDecoration.ts — Blame ゴーストテキスト | issue02 | Group 3 | 未着手 |
-| issue05 | historyPanel.ts — コミット履歴 + ファイル一覧 | issue02 | Group 3 | 未着手 |
-| issue06 | historyPanel.ts — ファイル履歴 + diff | issue05 | Group 4 | 未着手 |
-| issue07 | extension.ts 統合 + .vsix パッケージ化 | issue03, issue04, issue06 | Group 5 | 未着手 |
+| issue01 | 環境構築（package.json / tsconfig.json） | なし | Group 1 | 完了 |
+| issue02 | gitService.ts — git コマンド共通層 | issue01 | Group 2 | 完了 |
+| issue03 | sidebarProvider.ts — サイドバー TreeView | issue02 | Group 3 | 完了 |
+| issue04 | blameDecoration.ts — Blame ゴーストテキスト | issue02 | Group 3 | 完了 |
+| issue05 | historyPanel.ts — コミット履歴 + ファイル一覧 | issue02 | Group 3 | 完了 |
+| issue06 | historyPanel.ts — ファイル履歴 + diff | issue05 | Group 4 | 完了 |
+| issue07 | extension.ts 統合 + .vsix パッケージ化 | issue03, issue04, issue06 | Group 5 | 完了 |
+| issue08 | UX 改善 — インライン split diff + キーボードナビ + 構文ハイライト | issue06 | Group 6 | 完了 |
 
 ---
 
@@ -28,6 +29,8 @@ Group 3: issue03 ┐
 Group 4: issue06  （historyPanel.ts に追記、issue05と同ファイルのため逐次）
     ↓
 Group 5: issue07  （extension.ts 統合 + vsix）
+    ↓
+Group 6: issue08  （UX 改善 — インライン diff + キーボードナビ + 構文ハイライト）
 ```
 
 ---

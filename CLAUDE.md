@@ -25,9 +25,12 @@ git リポジトリの状態・履歴・差分を表示特化で提供するシ�
 - 言語は TypeScript を使用する
 - VSCode Extension API を使用する
 - git 操作は child_process.execSync で直接実行する（外部ライブラリなし）
-- diff 表示は vscode.diff() を使用する
+- diff 表示はパネル内インライン split diff を使用する（`vscode.diff()` は使用しない）
 - パッケージ管理は npm を使用する
 - 機能を足さない設計を原則とする（トグル・設定項目は原則設けない）
+- **webview スクリプトは必ず外部 JS ファイルとして `out/` に配置し `asWebviewUri()` で読み込む**
+  - VSCode の CSP はインラインスクリプトを nonce 付きでもブロックする場合があり、外部ファイル方式が唯一の確実な手段
+  - `localResourceRoots` に `extensionUri/out` を指定し、`script-src 'nonce-...' ${csp}` を CSP に含める
 
 ---
 
@@ -88,7 +91,6 @@ Supervisor が Implementer を並列起動する際のルール：
 - **起動方法**：単一メッセージ内で複数の `Agent(isolation: "worktree")` を同時に呼び出す
 - **各 Implementer** は独立した git worktree で作業するためファイル競合が発生しない
 - **グループ完了後**：全 PR がマージされてから次のグループを起動する
-- **SQLite テスト**：各 worktree で独立した DB ファイルを使う（例: `TEST_DB=./test.db uv run scanlog scan ...`）
 
 ```
 # 並列起動の例（Supervisor がこの形で Agent を呼び出す）
@@ -113,6 +115,7 @@ Agent(isolation="worktree", prompt="issues/issue03.md を実装")   ┘ 起動
 - MVP外の機能を先に実装すること
 - issue を曖昧なまま作成すること
 - 人間確認なしで連続実行すること
+- **webview にインラインスクリプトを書くこと**（VSCode CSP により動作しない。必ず外部ファイル化すること）
 
 ---
 
@@ -125,8 +128,8 @@ Agent(isolation="worktree", prompt="issues/issue03.md を実装")   ┘ 起動
 4. blameDecoration.ts（Blame 常時表示）
 5. historyPanel.ts（コミット履歴 Webview）
 6. ファイル一覧表示（コミットクリック → 変更ファイル）
-7. ファイル履歴表示（ファイルクリック → そのファイルの履歴）
-8. 左右 diff 表示（履歴行クリック → vscode.diff()）
+7. ファイル履歴表示（h キー → そのファイルの履歴パネル）
+8. インライン split diff 表示（行番号・構文ハイライト付き、↑↓キーナビ）
 9. .vsix パッケージ化・動作確認
 
 ---
