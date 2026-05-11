@@ -133,6 +133,18 @@ export function getBlameLines(cwd: string, filePath: string): BlameLine[] {
   }
 }
 
+export function getFileDiff(cwd: string, hash: string, filePath: string): string {
+  try {
+    return execSync(`git diff ${hash}^..${hash} -- "${filePath}"`, { cwd, encoding: 'utf8' });
+  } catch {
+    try {
+      return execSync(`git show ${hash} -- "${filePath}"`, { cwd, encoding: 'utf8' });
+    } catch {
+      return '';
+    }
+  }
+}
+
 export function getDiffUris(
   cwd: string,
   hash: string,
