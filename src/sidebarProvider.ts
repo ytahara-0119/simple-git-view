@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { getCurrentBranch, getChangedFiles } from './gitService';
 
 export class GitStatusProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -28,7 +29,17 @@ export class GitStatusProvider implements vscode.TreeDataProvider<vscode.TreeIte
     const fileItems = files.map(f => {
       const item = new vscode.TreeItem(f.path, vscode.TreeItemCollapsibleState.None);
       item.description = f.status;
-      item.iconPath = new vscode.ThemeIcon('file');
+      const absolutePath = path.join(this.workspaceRoot, f.path);
+      const uri = vscode.Uri.file(absolutePath);
+      item.resourceUri = uri;
+      // 削除済みファイル（status `D`）は vscode.open でエラーになるので command を設定しない
+      if (f.status !== 'D') {
+        item.command = {
+          command: 'vscode.open',
+          arguments: [uri],
+          title: 'Open File',
+        };
+      }
       return item;
     });
 
