@@ -11,6 +11,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 
 - **表示特化** — git への書き込み操作は一切行わない
 - **機能を足さない** — トグルやオン/オフ設定は原則設けない
+- **VSCode 標準と重複しない** — VSCode が標準で提供する UI（Source Control ビュー等）と機能重複する独自 UI は設けない
 - **外部ライブラリなし** — `child_process` で git コマンドを直接実行
 - **個人利用** — Marketplace 公開なし、`.vsix` でローカルインストール
 
@@ -22,28 +23,42 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 |---|---|
 | 言語 | TypeScript |
 | API | VSCode Extension API |
-| git 実行 | `child_process.execSync` |
-| diff 表示 | パネル内インライン split diff（行番号・構文ハイライト付き） |
+| git 実行 | `child_process.execFile` / `execFileSync`（shell 経由しない） |
+| diff 表示 | Webview パネル内インライン split diff（行番号付き） |
 | webview スクリプト | 外部 JS ファイル（CSP nonce + `asWebviewUri`） |
+| ブランチ表示 | StatusBar Item |
 | アクティベート条件 | ワークスペースに `.git` が存在するとき |
 
 ---
 
 ## 機能仕様
 
-### 1. サイドバー（Git Status）
+本拡張が提供する独自価値は次の 3 つに絞る：
 
-- アクティビティバーに専用アイコンで常時表示
-- 表示内容
-  - 現在のブランチ名
-  - 変更ファイルの一覧（ステータス付き: `M` / `A` / `?` など）
-- ファイル保存時に自動更新
+1. **StatusBar ブランチ表示**（クリックで履歴を開く動線）
+2. **コミット履歴 Webview**（split diff + キーボードナビゲーション）
+3. **Blame ゴーストテキスト**（常時表示）
+
+変更ファイル一覧の表示は VSCode 標準の Source Control ビューに任せる（独自実装しない）。
+
+---
+
+### 1. StatusBar ブランチ表示
+
+- VSCode 画面下部の StatusBar 右側に常時表示
+- 表示内容: `$(git-branch) <ブランチ名>`
+- クリック → コミット履歴 Webview を開く（`simpleGitView.showHistory` を実行）
+- tooltip: `Simple Git View: Show Commit History`
+- 更新タイミング:
+  - 拡張機能 activate 時
+  - `.git/HEAD` の変更を検出したとき（`FileSystemWatcher` で監視）
+- ブランチ取得に失敗したときは StatusBar Item を非表示にする
 
 ---
 
 ### 2. コミット履歴パネル
 
-- 拡張機能起動時に自動表示、コマンド `Git: Show Commit History` でも起動可
+- コマンド `Git View: Show Commit History` または StatusBar Item クリックで Webview パネルを起動（起動時の自動表示は行わない）
 - 表示カラム
 
   | カラム | 備考 |
@@ -54,6 +69,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
   | 日時 | 相対表示（例: 2 days ago） |
 
 - 表示件数: 直近 50 件
+- パネル起動直後に先頭コミットを自動選択
 - 行クリック / ↑↓キー → 選択行をハイライトし、変更ファイル一覧をパネル下部に表示
 - Enter キー → 変更ファイル一覧の先頭にフォーカス移動（ファイル読み込み後に自動フォーカス）
 
@@ -73,7 +89,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 - diff 表示仕様
   - 左右分割テーブル（削除行: 赤背景 / 追加行: 緑背景 / コンテキスト行: 無色）
   - 各行に行番号を表示
-  - TypeScript / JavaScript の構文ハイライト（キーワード・文字列・コメント・数値・型名）
+  - 構文ハイライトは行わない（VSCode テーマの foreground で単色表示）
 - `h` キー → そのファイル単体のコミット履歴を新規パネルで開く
 - Escape キー → コミット一覧にフォーカスを戻す
 
@@ -92,7 +108,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 - 選択ファイル単体のコミット履歴を新規 Webview パネルで表示（直近 50 件）
 - パネル起動時に先頭コミットを自動選択し diff を表示
 - 行クリック / ↑↓キー → そのコミットにおける選択ファイルの diff をパネル内にインライン表示
-- diff 表示仕様はセクション 3 と同一（行番号・構文ハイライト）
+- diff 表示仕様はセクション 3 と同一（行番号あり、構文ハイライトなし）
 
 #### キーボードショートカット（ファイル履歴一覧）
 
@@ -103,15 +119,17 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 #### 画面遷移
 
 ```
-コミット履歴一覧
-  └─ 行クリック / ↑↓
-       └─ 変更ファイル一覧（パネル下部）
-            ├─ ファイルクリック / ↑↓
-            │    └─ インライン split diff（行番号・構文ハイライト）
-            └─ h キー
-                 └─ ファイル履歴パネル（新規タブ）
-                      └─ 行クリック / ↑↓
-                           └─ インライン split diff（行番号・構文ハイライト）
+StatusBar [$(git-branch) main]
+  └─ クリック
+       └─ コミット履歴 Webview
+             └─ 行クリック / ↑↓
+                  └─ 変更ファイル一覧（パネル下部）
+                       ├─ ファイルクリック / ↑↓
+                       │    └─ インライン split diff（行番号付き）
+                       └─ h キー
+                            └─ ファイル履歴パネル（新規タブ）
+                                 └─ 行クリック / ↑↓
+                                      └─ インライン split diff
 ```
 
 ---
@@ -124,6 +142,14 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
   - 色: グレー系（`editorCodeLens.foreground` に準拠）
   - フォントスタイル: italic
 - エディタ切り替え時に自動再適用
+- ファイル単位でキャッシュし、保存（mtime 変更）時に再取得
+
+---
+
+## エラー UX
+
+- git コマンド失敗時は VSCode の Output channel `Simple Git View` にエラー詳細を出力する
+- ユーザー通知（`showErrorMessage`）は行わない（過剰通知を避ける）
 
 ---
 
@@ -135,8 +161,8 @@ simple-git-view/
 ├── tsconfig.json
 └── src/
     ├── extension.ts          # エントリポイント・コマンド登録
-    ├── gitService.ts         # git コマンド実行・データ取得
-    ├── sidebarProvider.ts    # サイドバー TreeView
+    ├── gitService.ts         # git コマンド実行・データ取得・Output channel
+    ├── statusBarItem.ts      # StatusBar ブランチ表示
     ├── historyPanel.ts       # コミット履歴 Webview パネル（ホスト側）
     ├── webviewMain.ts        # コミット履歴パネルのブラウザ側スクリプト
     ├── fileHistoryMain.ts    # ファイル履歴パネルのブラウザ側スクリプト
@@ -149,7 +175,17 @@ simple-git-view/
 
 | コマンド ID | タイトル | 起動方法 |
 |---|---|---|
-| `simpleGitView.showHistory` | Git: Show Commit History | コマンドパレット・起動時自動表示 |
+| `simpleGitView.showHistory` | Git View: Show Commit History | コマンドパレット / StatusBar Item クリック |
+
+---
+
+## 提供しないもの（明示）
+
+以下は VSCode 標準または他拡張で十分なため、本拡張では提供しない：
+
+- 変更ファイル一覧のサイドバー TreeView（→ VSCode 標準 Source Control に委ねる）
+- ブランチ切替・コミット作成などの書き込み操作（表示特化原則）
+- Marketplace 公開・自動更新
 
 ---
 
