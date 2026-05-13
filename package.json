@@ -14,7 +14,12 @@
     "commands": [
       {
         "command": "simpleGitView.showHistory",
-        "title": "Git: Show Commit History"
+        "title": "Git View: Show Commit History"
+      },
+      {
+        "command": "simpleGitView.refreshStatus",
+        "title": "Git View: Refresh Status",
+        "icon": "$(refresh)"
       }
     ],
     "viewsContainers": {
@@ -22,7 +27,7 @@
         {
           "id": "simpleGitViewContainer",
           "title": "Simple Git View",
-          "icon": "$(source-control)"
+          "icon": "media/icon.svg"
         }
       ]
     },
@@ -31,6 +36,15 @@
         {
           "id": "simpleGitView.gitStatus",
           "name": "Git Status"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "simpleGitView.refreshStatus",
+          "when": "view == simpleGitView.gitStatus",
+          "group": "navigation"
         }
       ]
     }
