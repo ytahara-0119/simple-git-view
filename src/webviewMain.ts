@@ -10,13 +10,6 @@ declare function acquireVsCodeApi(): {
   let currentHash: string | null = null;
   let focusFileListAfterRender = false;
 
-  const jsStatus = document.getElementById('js-status');
-  if (jsStatus) {
-    jsStatus.textContent = 'JS: 起動済み ✓';
-    (jsStatus as HTMLElement).style.background = 'rgba(80,200,120,0.2)';
-    (jsStatus as HTMLElement).style.borderLeftColor = 'green';
-  }
-
   const tbody = document.querySelector('tbody') as HTMLElement | null;
   if (tbody) {
     tbody.tabIndex = -1;
@@ -158,84 +151,6 @@ declare function acquireVsCodeApi(): {
       .replace(/"/g, '&quot;');
   }
 
-  // VS Code dark theme colors
-  const HL_KW  = 'color:#569cd6';  // keywords
-  const HL_STR = 'color:#ce9178';  // strings
-  const HL_CM  = 'color:#6a9955';  // comments
-  const HL_NUM = 'color:#b5cea8';  // numbers
-  const HL_TYPE= 'color:#4ec9b0';  // types / PascalCase
-  const HL_PROP= 'color:#9cdcfe';  // properties / variables
-
-  const KEYWORDS = new Set([
-    'abstract','any','as','asserts','async','await','boolean','break','case','catch',
-    'class','const','continue','debugger','declare','default','delete','do','else',
-    'enum','export','extends','false','finally','for','from','function','get','if',
-    'implements','import','in','infer','instanceof','interface','is','keyof','let',
-    'module','namespace','never','new','null','number','object','of','package',
-    'private','protected','public','readonly','require','return','set','static',
-    'string','super','switch','symbol','this','throw','true','try','type','typeof',
-    'undefined','unique','unknown','var','void','while','with','yield',
-  ]);
-
-  function syntaxHighlight(code: string): string {
-    let out = '';
-    let i = 0;
-    while (i < code.length) {
-      // Line comment
-      if (code[i] === '/' && code[i + 1] === '/') {
-        out += '<span style="' + HL_CM + '">' + escapeHtml(code.slice(i)) + '</span>';
-        break;
-      }
-      // Block comment fragment
-      if (code[i] === '/' && code[i + 1] === '*') {
-        const end = code.indexOf('*/', i + 2);
-        const chunk = end === -1 ? code.slice(i) : code.slice(i, end + 2);
-        out += '<span style="' + HL_CM + '">' + escapeHtml(chunk) + '</span>';
-        i += chunk.length;
-        continue;
-      }
-      // String literals
-      if (code[i] === '"' || code[i] === "'" || code[i] === '`') {
-        const q = code[i];
-        let j = i + 1;
-        while (j < code.length) {
-          if (code[j] === '\\') { j += 2; continue; }
-          if (code[j] === q) { j++; break; }
-          j++;
-        }
-        out += '<span style="' + HL_STR + '">' + escapeHtml(code.slice(i, j)) + '</span>';
-        i = j;
-        continue;
-      }
-      // Number
-      if (/\d/.test(code[i]) && (i === 0 || /\W/.test(code[i - 1]))) {
-        let j = i;
-        while (j < code.length && /[\d._xXa-fA-FnN]/.test(code[j])) { j++; }
-        out += '<span style="' + HL_NUM + '">' + escapeHtml(code.slice(i, j)) + '</span>';
-        i = j;
-        continue;
-      }
-      // Identifier / keyword / type
-      if (/[a-zA-Z_$]/.test(code[i])) {
-        let j = i;
-        while (j < code.length && /[a-zA-Z0-9_$]/.test(code[j])) { j++; }
-        const word = code.slice(i, j);
-        if (KEYWORDS.has(word)) {
-          out += '<span style="' + HL_KW + '">' + escapeHtml(word) + '</span>';
-        } else if (/^[A-Z]/.test(word)) {
-          out += '<span style="' + HL_TYPE + '">' + escapeHtml(word) + '</span>';
-        } else {
-          out += '<span style="' + HL_PROP + '">' + escapeHtml(word) + '</span>';
-        }
-        i = j;
-        continue;
-      }
-      out += escapeHtml(code[i]);
-      i++;
-    }
-    return out;
-  }
-
   function renderSplitDiff(diff: string): string {
     const lines = diff.split('\n');
     const rows: string[] = [];
@@ -252,10 +167,10 @@ declare function acquireVsCodeApi(): {
         const lNum = hasDel ? String(leftLine + i) : '';
         const rNum = hasAdd ? String(rightLine + i) : '';
         const lCell = hasDel
-          ? '<td class="ln">' + lNum + '</td><td class="diff-del">' + syntaxHighlight(pendingDel[i]) + '</td>'
+          ? '<td class="ln">' + lNum + '</td><td class="diff-del">' + escapeHtml(pendingDel[i]) + '</td>'
           : '<td class="ln"></td><td class="diff-empty"></td>';
         const rCell = hasAdd
-          ? '<td class="ln">' + rNum + '</td><td class="diff-add">' + syntaxHighlight(pendingAdd[i]) + '</td>'
+          ? '<td class="ln">' + rNum + '</td><td class="diff-add">' + escapeHtml(pendingAdd[i]) + '</td>'
           : '<td class="ln"></td><td class="diff-empty"></td>';
         rows.push('<tr>' + lCell + rCell + '</tr>');
       }
@@ -281,7 +196,7 @@ declare function acquireVsCodeApi(): {
       } else {
         flushPending();
         const content = line.startsWith(' ') ? line.slice(1) : line;
-        const hl = syntaxHighlight(content);
+        const hl = escapeHtml(content);
         rows.push('<tr class="diff-context"><td class="ln">' + leftLine + '</td><td>' + hl + '</td><td class="ln">' + rightLine + '</td><td>' + hl + '</td></tr>');
         leftLine++;
         rightLine++;
@@ -290,5 +205,11 @@ declare function acquireVsCodeApi(): {
     flushPending();
 
     return '<table class="split-diff">' + rows.join('') + '</table>';
+  }
+
+  // Auto-select first commit row after listeners are registered
+  if (tbody) {
+    const firstRow = tbody.querySelector('tr') as HTMLElement | null;
+    if (firstRow) { selectCommitRow(firstRow); }
   }
 }());
