@@ -1,6 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getBlameLines } from './gitService';
+import * as fs from 'fs';
+import { getBlameLinesAsync, BlameLine } from './gitService';
+
+interface CacheEntry {
+  mtimeMs: number;
+  lines: BlameLine[];
+}
 
 export class BlameDecorationProvider {
   private decorationType = vscode.window.createTextEditorDecorationType({
@@ -10,10 +16,27 @@ export class BlameDecorationProvider {
     },
   });
 
-  applyBlame(editor: vscode.TextEditor): void {
+  private cache = new Map<string, CacheEntry>();
+
+  async applyBlame(editor: vscode.TextEditor): Promise<void> {
     const filePath = editor.document.uri.fsPath;
     const cwd = path.dirname(filePath);
-    const lines = getBlameLines(cwd, filePath);
+
+    let mtimeMs = 0;
+    try {
+      mtimeMs = fs.statSync(filePath).mtimeMs;
+    } catch {
+      mtimeMs = 0;
+    }
+
+    let lines: BlameLine[];
+    const cached = this.cache.get(filePath);
+    if (cached && cached.mtimeMs === mtimeMs) {
+      lines = cached.lines;
+    } else {
+      lines = await getBlameLinesAsync(cwd, filePath);
+      this.cache.set(filePath, { mtimeMs, lines });
+    }
 
     if (lines.length === 0) {
       editor.setDecorations(this.decorationType, []);
@@ -35,5 +58,9 @@ export class BlameDecorationProvider {
     });
 
     editor.setDecorations(this.decorationType, decorations);
+  }
+
+  invalidate(filePath: string): void {
+    this.cache.delete(filePath);
   }
 }
