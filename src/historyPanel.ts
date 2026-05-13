@@ -88,7 +88,6 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
     <thead><tr><th>ハッシュ</th><th>メッセージ</th><th>著者</th><th>日時</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div id="js-status" style="padding:3px 8px;font-size:0.8em;background:rgba(255,100,100,0.2);border-left:3px solid red;">JS: 未起動</div>
   <div id="diff-view"></div>
   <script nonce="${fileNonce}" src="${scriptUri}"></script>
 </body>
@@ -244,7 +243,6 @@ export class HistoryPanel {
     </thead>
     <tbody>${rows}</tbody>
   </table>
-  <div id="js-status" style="padding:4px 8px;margin-bottom:8px;font-size:0.85em;background:rgba(255,100,100,0.2);border-left:3px solid red;">JS: 未起動（ロード中...）</div>
   <div id="file-list"></div>
   <div id="diff-view"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
