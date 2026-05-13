@@ -37,8 +37,10 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // 5. 起動時にコミット履歴パネルを自動表示
-  HistoryPanel.show(cwd, context);
+  // 5. サイドバー TreeView の再読み込みコマンド
+  context.subscriptions.push(
+    vscode.commands.registerCommand('simpleGitView.refreshStatus', () => statusProvider.refresh())
+  );
 
   context.subscriptions.push(treeView);
 }
