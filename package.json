@@ -15,39 +15,8 @@
       {
         "command": "simpleGitView.showHistory",
         "title": "Git View: Show Commit History"
-      },
-      {
-        "command": "simpleGitView.refreshStatus",
-        "title": "Git View: Refresh Status",
-        "icon": "$(refresh)"
       }
-    ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "simpleGitViewContainer",
-          "title": "Simple Git View",
-          "icon": "media/icon.svg"
-        }
-      ]
-    },
-    "views": {
-      "simpleGitViewContainer": [
-        {
-          "id": "simpleGitView.gitStatus",
-          "name": "Git Status"
-        }
-      ]
-    },
-    "menus": {
-      "view/title": [
-        {
-          "command": "simpleGitView.refreshStatus",
-          "when": "view == simpleGitView.gitStatus",
-          "group": "navigation"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
