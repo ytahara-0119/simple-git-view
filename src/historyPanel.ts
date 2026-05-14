@@ -117,6 +117,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     }
     if (msg.command === 'close') {
       panel.dispose();
+      HistoryPanel.currentPanel?.reveal();
     }
   });
 
@@ -127,10 +128,14 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
 }
 
 export class HistoryPanel {
-  private static currentPanel: HistoryPanel | undefined;
+  static currentPanel: HistoryPanel | undefined;
   private readonly panel: vscode.WebviewPanel;
   private readonly cwd: string;
   private readonly extensionUri: vscode.Uri;
+
+  reveal(): void {
+    this.panel.reveal(vscode.ViewColumn.One);
+  }
 
   static show(cwd: string, context: vscode.ExtensionContext): void {
     if (HistoryPanel.currentPanel) {
