@@ -15,6 +15,40 @@
       {
         "command": "simpleGitView.showHistory",
         "title": "Git View: Show Commit History"
+      },
+      {
+        "command": "simpleGitView.showFileHistory",
+        "title": "Git View: Show File History",
+        "icon": "$(history)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "simpleGitView.showFileHistory",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "simpleGitView.showFileHistory",
+          "when": "editorTextFocus",
+          "group": "navigation@1"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "simpleGitView.showHistory",
+        "key": "ctrl+alt+h",
+        "mac": "cmd+alt+h"
+      },
+      {
+        "command": "simpleGitView.showFileHistory",
+        "key": "ctrl+alt+shift+h",
+        "mac": "cmd+alt+shift+h",
+        "when": "editorTextFocus"
       }
     ]
   },

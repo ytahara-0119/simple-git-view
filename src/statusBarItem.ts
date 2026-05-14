@@ -9,7 +9,11 @@ export class StatusBarBranch {
     this.cwd = cwd;
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     this.item.command = 'simpleGitView.showHistory';
-    this.item.tooltip = 'Simple Git View: Show Commit History';
+    const md = new vscode.MarkdownString();
+    md.appendMarkdown('**Simple Git View**\n\n');
+    md.appendMarkdown('- Click: Show commit history\n');
+    md.appendMarkdown('- `⌘⇧P` → `Git View` for all commands\n');
+    this.item.tooltip = md;
     this.update();
     this.item.show();
   }
