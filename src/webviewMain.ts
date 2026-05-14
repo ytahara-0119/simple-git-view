@@ -204,7 +204,14 @@ declare function acquireVsCodeApi(): {
     }
     flushPending();
 
-    return '<table class="split-diff">' + rows.join('') + '</table>';
+    return '<table class="split-diff">' +
+      '<colgroup>' +
+        '<col class="col-ln" />' +
+        '<col class="col-code" />' +
+        '<col class="col-ln" />' +
+        '<col class="col-code" />' +
+      '</colgroup>' +
+      rows.join('') + '</table>';
   }
 
   // Auto-select first commit row after listeners are registered
