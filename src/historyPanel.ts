@@ -79,18 +79,17 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view { margin-top:12px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
-    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em;table-layout:fixed; }
-    .split-diff col.col-ln { width:40px; }
-    .split-diff col.col-code { width:calc(50% - 40px); }
-    .split-diff td { padding:1px 6px;white-space:pre;overflow:hidden;text-overflow:ellipsis;vertical-align:top; }
-    .split-diff td:not(.ln) { width:calc(50% - 40px);overflow-x:auto;text-overflow:clip;scrollbar-width:thin; }
-    .split-diff td:not(.ln)::-webkit-scrollbar { height:6px; }
-    .split-diff td:not(.ln)::-webkit-scrollbar-thumb { background:var(--vscode-scrollbarSlider-background); }
-    .split-diff td.ln { width:40px;min-width:40px;text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
-    .split-diff tr.diff-meta td, .split-diff tr.diff-hunk td { color:var(--vscode-descriptionForeground);background:var(--vscode-textCodeBlock-background); }
-    .split-diff td.diff-del { background:rgba(244,71,71,0.18); }
-    .split-diff td.diff-add { background:rgba(78,201,78,0.18); }
-    .split-diff td.diff-empty { background:rgba(128,128,128,0.08); }
+    .split-diff { font-family:monospace;font-size:1.15em; }
+    .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid transparent; }
+    .split-diff .row.meta, .split-diff .row.hunk { grid-template-columns:1fr;color:var(--vscode-descriptionForeground);background:var(--vscode-textCodeBlock-background); }
+    .split-diff .meta-content { padding:1px 6px;white-space:pre;overflow-x:auto; }
+    .split-diff .ln { text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
+    .split-diff .cell { padding:1px 6px;white-space:pre;overflow-x:auto;min-width:0;scrollbar-width:thin; }
+    .split-diff .cell::-webkit-scrollbar { height:6px; }
+    .split-diff .cell::-webkit-scrollbar-thumb { background:var(--vscode-scrollbarSlider-background); }
+    .split-diff .cell.diff-del { background:rgba(244,71,71,0.18); }
+    .split-diff .cell.diff-add { background:rgba(78,201,78,0.18); }
+    .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
   </style>
 </head>
 <body>
@@ -244,18 +243,17 @@ export class HistoryPanel {
       border:1px solid var(--vscode-widget-border,#444);
       white-space:pre;
     }
-    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em;table-layout:fixed; }
-    .split-diff col.col-ln { width:40px; }
-    .split-diff col.col-code { width:calc(50% - 40px); }
-    .split-diff td { padding:1px 6px;white-space:pre;overflow:hidden;text-overflow:ellipsis;vertical-align:top; }
-    .split-diff td:not(.ln) { width:calc(50% - 40px);overflow-x:auto;text-overflow:clip;scrollbar-width:thin; }
-    .split-diff td:not(.ln)::-webkit-scrollbar { height:6px; }
-    .split-diff td:not(.ln)::-webkit-scrollbar-thumb { background:var(--vscode-scrollbarSlider-background); }
-    .split-diff td.ln { width:40px;min-width:40px;text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
-    .split-diff tr.diff-meta td, .split-diff tr.diff-hunk td { color:var(--vscode-descriptionForeground);background:var(--vscode-textCodeBlock-background); }
-    .split-diff td.diff-del { background:rgba(244,71,71,0.18); }
-    .split-diff td.diff-add { background:rgba(78,201,78,0.18); }
-    .split-diff td.diff-empty { background:rgba(128,128,128,0.08); }
+    .split-diff { font-family:monospace;font-size:1.15em; }
+    .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid transparent; }
+    .split-diff .row.meta, .split-diff .row.hunk { grid-template-columns:1fr;color:var(--vscode-descriptionForeground);background:var(--vscode-textCodeBlock-background); }
+    .split-diff .meta-content { padding:1px 6px;white-space:pre;overflow-x:auto; }
+    .split-diff .ln { text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
+    .split-diff .cell { padding:1px 6px;white-space:pre;overflow-x:auto;min-width:0;scrollbar-width:thin; }
+    .split-diff .cell::-webkit-scrollbar { height:6px; }
+    .split-diff .cell::-webkit-scrollbar-thumb { background:var(--vscode-scrollbarSlider-background); }
+    .split-diff .cell.diff-del { background:rgba(244,71,71,0.18); }
+    .split-diff .cell.diff-add { background:rgba(78,201,78,0.18); }
+    .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
   </style>
 </head>
 <body>

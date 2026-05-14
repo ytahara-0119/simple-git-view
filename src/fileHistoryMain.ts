@@ -68,9 +68,13 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       const max = Math.max(pendingDel.length, pendingAdd.length);
       for (let i = 0; i < max; i++) {
         const hasDel = i < pendingDel.length, hasAdd = i < pendingAdd.length;
-        const lc = hasDel ? '<td class="ln">' + (leftLine + i) + '</td><td class="diff-del">' + escapeHtml(pendingDel[i]) + '</td>' : '<td class="ln"></td><td class="diff-empty"></td>';
-        const rc = hasAdd ? '<td class="ln">' + (rightLine + i) + '</td><td class="diff-add">' + escapeHtml(pendingAdd[i]) + '</td>' : '<td class="ln"></td><td class="diff-empty"></td>';
-        rows.push('<tr>' + lc + rc + '</tr>');
+        const lCells = hasDel
+          ? '<div class="ln">' + (leftLine + i) + '</div><div class="cell diff-del">' + escapeHtml(pendingDel[i]) + '</div>'
+          : '<div class="ln"></div><div class="cell diff-empty"></div>';
+        const rCells = hasAdd
+          ? '<div class="ln">' + (rightLine + i) + '</div><div class="cell diff-add">' + escapeHtml(pendingAdd[i]) + '</div>'
+          : '<div class="ln"></div><div class="cell diff-empty"></div>';
+        rows.push('<div class="row">' + lCells + rCells + '</div>');
       }
       leftLine += pendingDel.length; rightLine += pendingAdd.length;
       pendingDel.length = 0; pendingAdd.length = 0;
@@ -78,30 +82,24 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
 
     for (const line of lines) {
       if (line.startsWith('diff ') || line.startsWith('index ') || line.startsWith('--- ') || line.startsWith('+++ ')) {
-        flush(); rows.push('<tr class="diff-meta"><td class="ln" colspan="2"></td><td colspan="2">' + escapeHtml(line) + '</td></tr>');
+        flush();
+        rows.push('<div class="row meta"><div class="meta-content">' + escapeHtml(line) + '</div></div>');
       } else if (line.startsWith('@@')) {
         flush();
         const m = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
         if (m) { leftLine = parseInt(m[1], 10); rightLine = parseInt(m[2], 10); }
-        rows.push('<tr class="diff-hunk"><td class="ln" colspan="2"></td><td colspan="2">' + escapeHtml(line) + '</td></tr>');
+        rows.push('<div class="row hunk"><div class="meta-content">' + escapeHtml(line) + '</div></div>');
       } else if (line.startsWith('-')) { pendingDel.push(line.slice(1)); }
       else if (line.startsWith('+')) { pendingAdd.push(line.slice(1)); }
       else {
         flush();
         const content = line.startsWith(' ') ? line.slice(1) : line;
-        const hl = escapeHtml(content);
-        rows.push('<tr class="diff-context"><td class="ln">' + leftLine + '</td><td>' + hl + '</td><td class="ln">' + rightLine + '</td><td>' + hl + '</td></tr>');
+        const esc = escapeHtml(content);
+        rows.push('<div class="row"><div class="ln">' + leftLine + '</div><div class="cell">' + esc + '</div><div class="ln">' + rightLine + '</div><div class="cell">' + esc + '</div></div>');
         leftLine++; rightLine++;
       }
     }
     flush();
-    return '<table class="split-diff">' +
-      '<colgroup>' +
-        '<col class="col-ln" />' +
-        '<col class="col-code" />' +
-        '<col class="col-ln" />' +
-        '<col class="col-code" />' +
-      '</colgroup>' +
-      rows.join('') + '</table>';
+    return '<div class="split-diff">' + rows.join('') + '</div>';
   }
 }());
