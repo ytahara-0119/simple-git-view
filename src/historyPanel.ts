@@ -48,10 +48,10 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
     const author = escapeHtml(c.author);
     const date = escapeHtml(c.date);
     return `<tr data-hash="${hash}" data-filepath="${escapeHtml(filePath)}" tabindex="-1" style="cursor:pointer;">
-      <td style="font-family:monospace;white-space:nowrap;">${shortHash}</td>
-      <td>${message}</td>
-      <td style="white-space:nowrap;">${author}</td>
-      <td style="white-space:nowrap;">${date}</td>
+      <td class="col-hash">${shortHash}</td>
+      <td class="col-msg">${message}</td>
+      <td class="col-author">${author}</td>
+      <td class="col-date">${date}</td>
     </tr>`;
   }).join('\n');
 
@@ -64,12 +64,19 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
   <style>
     body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:var(--vscode-foreground);background-color:var(--vscode-editor-background);margin:0;padding:8px; }
     h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size); }
-    table { width:100%;border-collapse:collapse; }
-    thead tr { background-color:var(--vscode-editorGroupHeader-tabsBackground); }
-    th,td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444); }
-    tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
-    tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
-    tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
+    table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed; }
+    table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
+    table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
+    table.commit-table tbody { max-height:280px;overflow-y:auto; }
+    table.commit-table thead tr { background-color:var(--vscode-editorGroupHeader-tabsBackground); }
+    table.commit-table th, table.commit-table td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    table.commit-table .col-hash { width:80px;font-family:monospace; }
+    table.commit-table .col-msg { width:auto;white-space:nowrap; }
+    table.commit-table .col-author { width:140px; }
+    table.commit-table .col-date { width:120px; }
+    table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
+    table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
+    table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view { margin-top:12px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
     .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em; }
@@ -84,8 +91,8 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
 </head>
 <body>
   <h3>${escapeHtml(filePath)}</h3>
-  <table>
-    <thead><tr><th>ハッシュ</th><th>メッセージ</th><th>著者</th><th>日時</th></tr></thead>
+  <table class="commit-table">
+    <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
   <div id="diff-view"></div>
@@ -170,10 +177,10 @@ export class HistoryPanel {
         const author = escapeHtml(commit.author);
         const date = escapeHtml(commit.date);
         return `<tr data-hash="${hash}" tabindex="-1" style="cursor:pointer;">
-          <td style="font-family:monospace;white-space:nowrap;">${shortHash}</td>
-          <td>${message}</td>
-          <td style="white-space:nowrap;">${author}</td>
-          <td style="white-space:nowrap;">${date}</td>
+          <td class="col-hash">${shortHash}</td>
+          <td class="col-msg">${message}</td>
+          <td class="col-author">${author}</td>
+          <td class="col-date">${date}</td>
         </tr>`;
       })
       .join('\n');
@@ -194,12 +201,19 @@ export class HistoryPanel {
       margin: 0;
       padding: 8px;
     }
-    table { width:100%;border-collapse:collapse; }
-    thead tr { background-color:var(--vscode-editorGroupHeader-tabsBackground);color:var(--vscode-tab-activeForeground); }
-    th,td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444); }
-    tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
-    tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
-    tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
+    table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed; }
+    table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
+    table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
+    table.commit-table tbody { max-height:280px;overflow-y:auto; }
+    table.commit-table thead tr { background-color:var(--vscode-editorGroupHeader-tabsBackground);color:var(--vscode-tab-activeForeground); }
+    table.commit-table th, table.commit-table td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    table.commit-table .col-hash { width:80px;font-family:monospace; }
+    table.commit-table .col-msg { width:auto;white-space:nowrap; }
+    table.commit-table .col-author { width:140px; }
+    table.commit-table .col-date { width:120px; }
+    table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
+    table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
+    table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #file-list { margin-top:16px; }
     #file-list h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
     #file-list ul { margin:0;padding-left:0; }
@@ -237,9 +251,9 @@ export class HistoryPanel {
   </style>
 </head>
 <body>
-  <table>
+  <table class="commit-table">
     <thead>
-      <tr><th>ハッシュ</th><th>メッセージ</th><th>著者</th><th>日時</th></tr>
+      <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
     </thead>
     <tbody>${rows}</tbody>
   </table>
