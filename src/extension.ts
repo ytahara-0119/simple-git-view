@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { BlameDecorationProvider } from './blameDecoration';
-import { HistoryPanel } from './historyPanel';
+import { HistoryPanel, openFileHistoryPanel } from './historyPanel';
 import { StatusBarBranch } from './statusBarItem';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -33,6 +33,18 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('simpleGitView.showHistory', () => {
       HistoryPanel.show(cwd, context);
+    })
+  );
+
+  // 4. ファイル履歴コマンド
+  context.subscriptions.push(
+    vscode.commands.registerCommand('simpleGitView.showFileHistory', () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showInformationMessage('No active editor');
+        return;
+      }
+      openFileHistoryPanel(cwd, editor.document.uri.fsPath, context.extensionUri);
     })
   );
 }

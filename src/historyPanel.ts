@@ -24,7 +24,14 @@ function openDiff(cwd: string, hash: string, filePath: string): void {
   vscode.commands.executeCommand('vscode.diff', uris.before, uris.after, title);
 }
 
-function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscode.Uri): void {
+const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();
+
+export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscode.Uri): void {
+  const existing = fileHistoryPanels.get(filePath);
+  if (existing) {
+    existing.reveal(vscode.ViewColumn.One);
+    return;
+  }
   const commits = getFileLog(cwd, filePath);
   const fileNonce = getNonce();
   const panel = vscode.window.createWebviewPanel(
@@ -108,6 +115,11 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
       const diff = getFileDiff(cwd, msg.hash, msg.filePath);
       panel.webview.postMessage({ command: 'renderDiff', diff, filePath: msg.filePath });
     }
+  });
+
+  fileHistoryPanels.set(filePath, panel);
+  panel.onDidDispose(() => {
+    fileHistoryPanels.delete(filePath);
   });
 }
 
