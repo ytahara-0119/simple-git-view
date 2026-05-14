@@ -37,20 +37,7 @@
           "group": "navigation@1"
         }
       ]
-    },
-    "keybindings": [
-      {
-        "command": "simpleGitView.showHistory",
-        "key": "ctrl+alt+h",
-        "mac": "cmd+alt+h"
-      },
-      {
-        "command": "simpleGitView.showFileHistory",
-        "key": "ctrl+alt+shift+h",
-        "mac": "cmd+alt+shift+h",
-        "when": "editorTextFocus"
-      }
-    ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

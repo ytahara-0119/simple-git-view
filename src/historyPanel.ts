@@ -115,6 +115,9 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
       const diff = getFileDiff(cwd, msg.hash, msg.filePath);
       panel.webview.postMessage({ command: 'renderDiff', diff, filePath: msg.filePath });
     }
+    if (msg.command === 'close') {
+      panel.dispose();
+    }
   });
 
   fileHistoryPanels.set(filePath, panel);

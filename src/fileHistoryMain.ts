@@ -24,6 +24,14 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
   }
 
   document.addEventListener('keydown', (e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null;
+    const tag = target && target.tagName ? target.tagName.toLowerCase() : '';
+    const isEditable = tag === 'input' || tag === 'textarea';
+    if (e.key === 'q' && !isEditable) {
+      e.preventDefault();
+      vscode.postMessage({ command: 'close' });
+      return;
+    }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
       const rows = Array.from(tbody ? tbody.querySelectorAll('tr') : []) as HTMLElement[];
