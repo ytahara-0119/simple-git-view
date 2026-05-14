@@ -17,8 +17,18 @@ export class BlameDecorationProvider {
   });
 
   private cache = new Map<string, CacheEntry>();
+  private selectionDisposable: vscode.Disposable;
+
+  constructor() {
+    this.selectionDisposable = vscode.window.onDidChangeTextEditorSelection(e => {
+      void this.applyBlame(e.textEditor);
+    });
+  }
 
   async applyBlame(editor: vscode.TextEditor): Promise<void> {
+    if (!editor) {
+      return;
+    }
     const filePath = editor.document.uri.fsPath;
     const cwd = path.dirname(filePath);
 
@@ -43,24 +53,34 @@ export class BlameDecorationProvider {
       return;
     }
 
-    const decorations: vscode.DecorationOptions[] = lines.map(line => {
-      const lineIndex = line.lineNumber - 1;
-      const textLine = editor.document.lineAt(Math.min(lineIndex, editor.document.lineCount - 1));
-      const range = new vscode.Range(textLine.range.end, textLine.range.end);
-      return {
+    const lineNumber = editor.selection.active.line + 1; // 1-based
+    const blame = lines.find(b => b.lineNumber === lineNumber);
+    if (!blame) {
+      editor.setDecorations(this.decorationType, []);
+      return;
+    }
+
+    const lineIndex = blame.lineNumber - 1;
+    const textLine = editor.document.lineAt(Math.min(lineIndex, editor.document.lineCount - 1));
+    const range = new vscode.Range(textLine.range.end, textLine.range.end);
+    editor.setDecorations(this.decorationType, [
+      {
         range,
         renderOptions: {
           after: {
-            contentText: `  ${line.author}: ${line.message}`,
+            contentText: `  ${blame.author}: ${blame.message}`,
           },
         },
-      };
-    });
-
-    editor.setDecorations(this.decorationType, decorations);
+      },
+    ]);
   }
 
   invalidate(filePath: string): void {
     this.cache.delete(filePath);
+  }
+
+  dispose(): void {
+    this.selectionDisposable.dispose();
+    this.decorationType.dispose();
   }
 }
