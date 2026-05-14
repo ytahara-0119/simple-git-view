@@ -79,7 +79,7 @@ function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscod
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view { margin-top:12px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
-    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em; }
+    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em;table-layout:fixed; }
     .split-diff td { padding:1px 6px;white-space:pre;overflow:hidden;text-overflow:ellipsis;vertical-align:top; }
     .split-diff td:not(.ln) { width:calc(50% - 40px); }
     .split-diff td.ln { width:40px;min-width:40px;text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
@@ -240,7 +240,7 @@ export class HistoryPanel {
       border:1px solid var(--vscode-widget-border,#444);
       white-space:pre;
     }
-    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em; }
+    .split-diff { width:100%;border-collapse:collapse;font-family:monospace;font-size:1.15em;table-layout:fixed; }
     .split-diff td { padding:1px 6px;white-space:pre;overflow:hidden;text-overflow:ellipsis;vertical-align:top; }
     .split-diff td:not(.ln) { width:calc(50% - 40px); }
     .split-diff td.ln { width:40px;min-width:40px;text-align:right;padding:1px 8px;color:var(--vscode-editorLineNumber-foreground,#858585);background:var(--vscode-editor-background);user-select:none;border-right:1px solid var(--vscode-widget-border,#444); }
