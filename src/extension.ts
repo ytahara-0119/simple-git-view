@@ -1,25 +1,24 @@
 import * as vscode from 'vscode';
-import { GitStatusProvider } from './sidebarProvider';
 import { BlameDecorationProvider } from './blameDecoration';
 import { HistoryPanel } from './historyPanel';
+import { StatusBarBranch } from './statusBarItem';
 
 export function activate(context: vscode.ExtensionContext) {
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders) { return; }
   const cwd = workspaceFolders[0].uri.fsPath;
 
-  // 1. サイドバー TreeView
-  const statusProvider = new GitStatusProvider(cwd);
-  const treeView = vscode.window.createTreeView('simpleGitView.gitStatus', {
-    treeDataProvider: statusProvider,
-  });
-
-  // 2. ファイル保存時にサイドバーを更新
-  context.subscriptions.push(
-    vscode.workspace.onDidSaveTextDocument(() => statusProvider.refresh())
+  // 1. StatusBar ブランチ表示
+  const statusBar = new StatusBarBranch(cwd);
+  context.subscriptions.push(statusBar);
+  const headWatcher = vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(cwd, '.git/HEAD')
   );
+  headWatcher.onDidChange(() => statusBar.update());
+  headWatcher.onDidCreate(() => statusBar.update());
+  context.subscriptions.push(headWatcher);
 
-  // 3. Blame 常時表示
+  // 2. Blame 常時表示
   const blameProvider = new BlameDecorationProvider();
   if (vscode.window.activeTextEditor) {
     blameProvider.applyBlame(vscode.window.activeTextEditor);
@@ -30,19 +29,12 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
-  // 4. コミット履歴コマンド
+  // 3. コミット履歴コマンド
   context.subscriptions.push(
     vscode.commands.registerCommand('simpleGitView.showHistory', () => {
       HistoryPanel.show(cwd, context);
     })
   );
-
-  // 5. サイドバー TreeView の再読み込みコマンド
-  context.subscriptions.push(
-    vscode.commands.registerCommand('simpleGitView.refreshStatus', () => statusProvider.refresh())
-  );
-
-  context.subscriptions.push(treeView);
 }
 
 export function deactivate() {}
