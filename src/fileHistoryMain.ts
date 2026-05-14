@@ -95,6 +95,13 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       }
     }
     flush();
-    return '<table class="split-diff">' + rows.join('') + '</table>';
+    return '<table class="split-diff">' +
+      '<colgroup>' +
+        '<col class="col-ln" />' +
+        '<col class="col-code" />' +
+        '<col class="col-ln" />' +
+        '<col class="col-code" />' +
+      '</colgroup>' +
+      rows.join('') + '</table>';
   }
 }());
