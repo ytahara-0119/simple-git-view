@@ -20,6 +20,11 @@ declare function acquireVsCodeApi(): {
     });
   }
 
+  function visibleRows(): HTMLElement[] {
+    const all = Array.from(tbody ? tbody.querySelectorAll('tr') : []) as HTMLElement[];
+    return all.filter(r => r.offsetParent !== null);
+  }
+
   function selectCommitRow(row: HTMLElement): void {
     if (selectedCommitRow) { selectedCommitRow.classList.remove('selected'); }
     row.classList.add('selected');
@@ -53,11 +58,21 @@ declare function acquireVsCodeApi(): {
       if (tbody) { tbody.focus(); }
     }
 
+    if (e.key === 'm' && !inFileList) {
+      e.preventDefault();
+      document.body.classList.toggle('hide-merges');
+      if (selectedCommitRow && (selectedCommitRow as HTMLElement).offsetParent === null) {
+        const firstVisible = visibleRows()[0];
+        if (firstVisible) { selectCommitRow(firstVisible); }
+      }
+      return;
+    }
+
     if (!inFileList) {
       // Commit list navigation
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault();
-        const rows = Array.from(tbody ? tbody.querySelectorAll('tr') : []) as HTMLElement[];
+        const rows = visibleRows();
         if (rows.length === 0) { return; }
         const idx = selectedCommitRow ? rows.indexOf(selectedCommitRow as HTMLElement) : -1;
         let next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
@@ -225,9 +240,9 @@ declare function acquireVsCodeApi(): {
     return '<div class="split-diff">' + rows.join('') + '</div>';
   }
 
-  // Auto-select first commit row after listeners are registered
+  // Auto-select first visible commit row after listeners are registered
   if (tbody) {
-    const firstRow = tbody.querySelector('tr') as HTMLElement | null;
+    const firstRow = visibleRows()[0];
     if (firstRow) { selectCommitRow(firstRow); }
   }
 }());

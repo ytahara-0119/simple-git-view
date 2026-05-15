@@ -19,6 +19,7 @@ export interface Commit {
   date: string;
   insertions: number;
   deletions: number;
+  isMerge: boolean;
 }
 
 export interface BlameLine {
@@ -76,7 +77,7 @@ export function getCommitLog(cwd: string): Commit[] {
       '--max-count=50',
       '--shortstat',
       '--date=format:%Y-%m-%d %H:%M',
-      '--format=%H%x1F%s%x1F%an%x1F%ad',
+      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P',
     ]);
     return parseCommitLog(output);
   } catch (err) {
@@ -92,6 +93,7 @@ function parseCommitLog(output: string): Commit[] {
     if (line.includes('\x1F')) {
       if (current) { commits.push(current); }
       const parts = line.split('\x1F');
+      const parents = (parts[4] ?? '').trim();
       current = {
         hash: parts[0] ?? '',
         message: parts[1] ?? '',
@@ -99,6 +101,7 @@ function parseCommitLog(output: string): Commit[] {
         date: parts[3] ?? '',
         insertions: 0,
         deletions: 0,
+        isMerge: parents.includes(' '),
       };
       continue;
     }
@@ -132,7 +135,7 @@ export function getFileLog(cwd: string, filePath: string): Commit[] {
       '--max-count=50',
       '--shortstat',
       '--date=format:%Y-%m-%d %H:%M',
-      '--format=%H%x1F%s%x1F%an%x1F%ad',
+      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P',
       '--',
       filePath,
     ]);

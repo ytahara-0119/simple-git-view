@@ -6,6 +6,11 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
   let selectedRow: HTMLElement | null = null;
   const tbody = document.querySelector('tbody') as HTMLElement;
 
+  function visibleRows(): HTMLElement[] {
+    const all = Array.from(tbody ? tbody.querySelectorAll('tr') : []) as HTMLElement[];
+    return all.filter(r => r.offsetParent !== null);
+  }
+
   function selectRow(row: HTMLElement): void {
     if (!row) { return; }
     if (selectedRow) { selectedRow.classList.remove('selected'); }
@@ -53,6 +58,15 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       vscode.postMessage({ command: 'close' });
       return;
     }
+    if (e.key === 'm') {
+      e.preventDefault();
+      document.body.classList.toggle('hide-merges');
+      if (selectedRow && selectedRow.offsetParent === null) {
+        const firstVisible = visibleRows()[0];
+        if (firstVisible) { selectRow(firstVisible); }
+      }
+      return;
+    }
     if (e.key === 'Enter' && selectedRow) {
       e.preventDefault();
       const dv = document.getElementById('diff-view') as HTMLElement | null;
@@ -61,7 +75,7 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
-      const rows = Array.from(tbody ? tbody.querySelectorAll('tr') : []) as HTMLElement[];
+      const rows = visibleRows();
       const idx = selectedRow ? rows.indexOf(selectedRow) : -1;
       let next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
       next = Math.max(0, Math.min(rows.length - 1, next));
@@ -82,9 +96,9 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     }
   });
 
-  // Auto-select first row after all listeners are registered
+  // Auto-select first visible row after all listeners are registered
   if (tbody) {
-    const firstRow = tbody.querySelector('tr') as HTMLElement | null;
+    const firstRow = visibleRows()[0];
     if (firstRow) { selectRow(firstRow); }
   }
 

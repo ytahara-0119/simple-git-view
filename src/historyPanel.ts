@@ -56,7 +56,8 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     const date = escapeHtml(c.date);
     const ins = c.insertions;
     const del = c.deletions;
-    return `<tr data-hash="${hash}" data-filepath="${escapeHtml(filePath)}" tabindex="-1" style="cursor:pointer;">
+    const cls = c.isMerge ? 'is-merge' : '';
+    return `<tr class="${cls}" data-hash="${hash}" data-filepath="${escapeHtml(filePath)}" tabindex="-1" style="cursor:pointer;">
       <td class="col-hash">${shortHash}</td>
       <td class="col-msg">${message}</td>
       <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
@@ -90,6 +91,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
     table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
+    body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
     #diff-view { margin-top:12px; outline:none; }
     #diff-view:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
@@ -106,7 +108,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
   </style>
 </head>
-<body>
+<body class="hide-merges">
   <h3>${escapeHtml(filePath)}</h3>
   <table class="commit-table">
     <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
@@ -208,7 +210,8 @@ export class HistoryPanel {
         const date = escapeHtml(commit.date);
         const ins = commit.insertions;
         const del = commit.deletions;
-        return `<tr data-hash="${hash}" tabindex="-1" style="cursor:pointer;">
+        const cls = commit.isMerge ? 'is-merge' : '';
+        return `<tr class="${cls}" data-hash="${hash}" tabindex="-1" style="cursor:pointer;">
           <td class="col-hash">${shortHash}</td>
           <td class="col-msg">${message}</td>
           <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
@@ -250,6 +253,7 @@ export class HistoryPanel {
     table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
     table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
+    body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
     #file-list { margin-top:16px; }
     #file-list h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
     #file-list ul { margin:0;padding-left:0; }
@@ -290,7 +294,7 @@ export class HistoryPanel {
     .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
   </style>
 </head>
-<body>
+<body class="hide-merges">
   <table class="commit-table">
     <thead>
       <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
