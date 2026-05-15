@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getCommitLog, getCommitFiles, getFileLog, getDiffUris, getFileDiff } from './gitService';
+import { getCommitLog, getCommitFiles, getFileLog, getFileDiff } from './gitService';
 
 function getNonce(): string {
   let text = '';
@@ -16,12 +16,6 @@ function escapeHtml(s: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
-}
-
-function openDiff(cwd: string, hash: string, filePath: string): void {
-  const uris = getDiffUris(cwd, hash, filePath);
-  const title = `${filePath} @ ${hash.slice(0, 7)}`;
-  vscode.commands.executeCommand('vscode.diff', uris.before, uris.after, title);
 }
 
 const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();

@@ -1,7 +1,4 @@
 import * as vscode from 'vscode';
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs';
 import { execFileSync, execFile } from 'child_process';
 import { promisify } from 'util';
 
@@ -209,37 +206,4 @@ export function getFileDiff(cwd: string, hash: string, filePath: string): string
       return '';
     }
   }
-}
-
-export function getDiffUris(
-  cwd: string,
-  hash: string,
-  filePath: string
-): { before: vscode.Uri; after: vscode.Uri } {
-  const basename = path.basename(filePath);
-  const tmpDir = os.tmpdir();
-
-  const beforePath = path.join(tmpDir, `sgv-before-${hash}-${basename}`);
-  const afterPath = path.join(tmpDir, `sgv-after-${hash}-${basename}`);
-
-  try {
-    const beforeContent = runGit(cwd, ['show', `${hash}^:${filePath}`]);
-    fs.writeFileSync(beforePath, beforeContent);
-  } catch (err) {
-    logError('getDiffUris(before)', err);
-    fs.writeFileSync(beforePath, '');
-  }
-
-  try {
-    const afterContent = runGit(cwd, ['show', `${hash}:${filePath}`]);
-    fs.writeFileSync(afterPath, afterContent);
-  } catch (err) {
-    logError('getDiffUris(after)', err);
-    fs.writeFileSync(afterPath, '');
-  }
-
-  return {
-    before: vscode.Uri.file(beforePath),
-    after: vscode.Uri.file(afterPath),
-  };
 }
