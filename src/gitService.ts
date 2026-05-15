@@ -17,6 +17,8 @@ export interface Commit {
   message: string;
   author: string;
   date: string;
+  insertions: number;
+  deletions: number;
 }
 
 export interface BlameLine {
@@ -69,23 +71,46 @@ export function getChangedFiles(cwd: string): FileStatus[] {
 
 export function getCommitLog(cwd: string): Commit[] {
   try {
-    const output = runGit(cwd, ['log', '--max-count=50', '--format=%H\t%s\t%an\t%ar']);
-    return output
-      .split('\n')
-      .filter(line => line.length > 0)
-      .map(line => {
-        const parts = line.split('\t');
-        return {
-          hash: parts[0] ?? '',
-          message: parts[1] ?? '',
-          author: parts[2] ?? '',
-          date: parts[3] ?? '',
-        };
-      });
+    const output = runGit(cwd, [
+      'log',
+      '--max-count=50',
+      '--shortstat',
+      '--date=format:%Y-%m-%d %H:%M',
+      '--format=%H%x1F%s%x1F%an%x1F%ad',
+    ]);
+    return parseCommitLog(output);
   } catch (err) {
     logError('getCommitLog', err);
     return [];
   }
+}
+
+function parseCommitLog(output: string): Commit[] {
+  const commits: Commit[] = [];
+  let current: Commit | undefined;
+  for (const line of output.split('\n')) {
+    if (line.includes('\x1F')) {
+      if (current) { commits.push(current); }
+      const parts = line.split('\x1F');
+      current = {
+        hash: parts[0] ?? '',
+        message: parts[1] ?? '',
+        author: parts[2] ?? '',
+        date: parts[3] ?? '',
+        insertions: 0,
+        deletions: 0,
+      };
+      continue;
+    }
+    if (current && /insertions?\(\+\)|deletions?\(-\)/.test(line)) {
+      const ins = line.match(/(\d+)\s+insertions?\(\+\)/);
+      const del = line.match(/(\d+)\s+deletions?\(-\)/);
+      if (ins) { current.insertions = parseInt(ins[1], 10); }
+      if (del) { current.deletions = parseInt(del[1], 10); }
+    }
+  }
+  if (current) { commits.push(current); }
+  return commits;
 }
 
 export function getCommitFiles(cwd: string, hash: string): string[] {
@@ -102,19 +127,16 @@ export function getCommitFiles(cwd: string, hash: string): string[] {
 
 export function getFileLog(cwd: string, filePath: string): Commit[] {
   try {
-    const output = runGit(cwd, ['log', '--max-count=50', '--format=%H\t%s\t%an\t%ar', '--', filePath]);
-    return output
-      .split('\n')
-      .filter(line => line.length > 0)
-      .map(line => {
-        const parts = line.split('\t');
-        return {
-          hash: parts[0] ?? '',
-          message: parts[1] ?? '',
-          author: parts[2] ?? '',
-          date: parts[3] ?? '',
-        };
-      });
+    const output = runGit(cwd, [
+      'log',
+      '--max-count=50',
+      '--shortstat',
+      '--date=format:%Y-%m-%d %H:%M',
+      '--format=%H%x1F%s%x1F%an%x1F%ad',
+      '--',
+      filePath,
+    ]);
+    return parseCommitLog(output);
   } catch (err) {
     logError('getFileLog', err);
     return [];

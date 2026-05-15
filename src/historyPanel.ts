@@ -54,9 +54,12 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     const message = escapeHtml(c.message);
     const author = escapeHtml(c.author);
     const date = escapeHtml(c.date);
+    const ins = c.insertions;
+    const del = c.deletions;
     return `<tr data-hash="${hash}" data-filepath="${escapeHtml(filePath)}" tabindex="-1" style="cursor:pointer;">
       <td class="col-hash">${shortHash}</td>
       <td class="col-msg">${message}</td>
+      <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
       <td class="col-author">${author}</td>
       <td class="col-date">${date}</td>
     </tr>`;
@@ -79,8 +82,11 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     table.commit-table th, table.commit-table td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
     table.commit-table .col-hash { width:80px;font-family:monospace; }
     table.commit-table .col-msg { width:auto;white-space:nowrap; }
+    table.commit-table .col-stat { width:90px;font-family:monospace; }
+    table.commit-table .ins { color:var(--vscode-gitDecoration-addedResourceForeground,#3fb950); }
+    table.commit-table .del { color:var(--vscode-gitDecoration-deletedResourceForeground,#f85149);margin-left:4px; }
     table.commit-table .col-author { width:140px; }
-    table.commit-table .col-date { width:120px; }
+    table.commit-table .col-date { width:130px; }
     table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
     table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
@@ -102,7 +108,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
 <body>
   <h3>${escapeHtml(filePath)}</h3>
   <table class="commit-table">
-    <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
+    <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
   <div id="diff-view"></div>
@@ -199,9 +205,12 @@ export class HistoryPanel {
         const message = escapeHtml(commit.message);
         const author = escapeHtml(commit.author);
         const date = escapeHtml(commit.date);
+        const ins = commit.insertions;
+        const del = commit.deletions;
         return `<tr data-hash="${hash}" tabindex="-1" style="cursor:pointer;">
           <td class="col-hash">${shortHash}</td>
           <td class="col-msg">${message}</td>
+          <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
           <td class="col-author">${author}</td>
           <td class="col-date">${date}</td>
         </tr>`;
@@ -232,8 +241,11 @@ export class HistoryPanel {
     table.commit-table th, table.commit-table td { padding:4px 8px;text-align:left;border-bottom:1px solid var(--vscode-widget-border,#444);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
     table.commit-table .col-hash { width:80px;font-family:monospace; }
     table.commit-table .col-msg { width:auto;white-space:nowrap; }
+    table.commit-table .col-stat { width:90px;font-family:monospace; }
+    table.commit-table .ins { color:var(--vscode-gitDecoration-addedResourceForeground,#3fb950); }
+    table.commit-table .del { color:var(--vscode-gitDecoration-deletedResourceForeground,#f85149);margin-left:4px; }
     table.commit-table .col-author { width:140px; }
-    table.commit-table .col-date { width:120px; }
+    table.commit-table .col-date { width:130px; }
     table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
     table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
@@ -279,7 +291,7 @@ export class HistoryPanel {
 <body>
   <table class="commit-table">
     <thead>
-      <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
+      <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
     </thead>
     <tbody>${rows}</tbody>
   </table>
