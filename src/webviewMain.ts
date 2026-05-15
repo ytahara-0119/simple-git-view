@@ -105,7 +105,14 @@ declare function acquireVsCodeApi(): {
       if (!container) { return; }
       const shortHash = msg.hash ? msg.hash.slice(0, 7) : '';
       if (!msg.files || msg.files.length === 0) {
-        container.innerHTML = '<h3>変更ファイル (' + shortHash + ')</h3><p>変更なし</p>';
+        container.innerHTML = '<h3>変更ファイル (' + shortHash + ')</h3>'
+          + '<p class="hint">'
+          + '<kbd>↑↓</kbd> 移動 · '
+          + '<kbd>Enter</kbd> diff へ · '
+          + '<kbd>h</kbd> ファイル履歴 · '
+          + '<kbd>Esc</kbd> コミット一覧'
+          + '</p>'
+          + '<p>変更なし</p>';
         return;
       }
       const ul = document.createElement('ul');
@@ -154,7 +161,13 @@ declare function acquireVsCodeApi(): {
         });
         ul.appendChild(li);
       });
-      container.innerHTML = '<h3>変更ファイル (' + shortHash + ')</h3><p class="hint">クリック: diff を下部に表示  /  h キー: ファイル履歴（新規タブ） /  Esc: コミット一覧に戻る</p>';
+      container.innerHTML = '<h3>変更ファイル (' + shortHash + ')</h3>'
+        + '<p class="hint">'
+        + '<kbd>↑↓</kbd> 移動 · '
+        + '<kbd>Enter</kbd> diff へ · '
+        + '<kbd>h</kbd> ファイル履歴 · '
+        + '<kbd>Esc</kbd> コミット一覧'
+        + '</p>';
       container.appendChild(ul);
       if (focusFileListAfterRender) {
         focusFileListAfterRender = false;

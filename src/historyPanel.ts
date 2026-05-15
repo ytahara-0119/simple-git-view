@@ -100,10 +100,28 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     .split-diff .cell.diff-del { background:rgba(244,71,71,0.18); }
     .split-diff .cell.diff-add { background:rgba(78,201,78,0.18); }
     .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
+    .hint { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0 8px 0; }
+    kbd {
+      display: inline-block;
+      padding: 0 4px;
+      font-size: 0.85em;
+      font-family: var(--vscode-editor-font-family, monospace);
+      border: 1px solid var(--vscode-widget-border, #444);
+      border-radius: 3px;
+      background: var(--vscode-keybindingLabel-background, rgba(128,128,128,0.17));
+      color: var(--vscode-keybindingLabel-foreground, inherit);
+    }
+    .hint kbd { margin: 0 2px; }
   </style>
 </head>
 <body class="hide-merges">
   <h3>${escapeHtml(filePath)}</h3>
+  <p class="hint">
+    <kbd>↑↓</kbd> 移動 ·
+    <kbd>Enter</kbd> diff へ ·
+    <kbd>m</kbd> マージ表示 ·
+    <kbd>q</kbd> 閉じる
+  </p>
   <table class="commit-table">
     <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
     <tbody>${rows}</tbody>
@@ -262,6 +280,18 @@ export class HistoryPanel {
     #file-list li.selected { background-color:rgba(80,200,120,0.25);color:var(--vscode-foreground); }
     #file-list li:focus { background-color:var(--vscode-list-focusBackground,rgba(80,200,120,0.4));outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     .hint { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0 0 0; }
+    kbd {
+      display: inline-block;
+      padding: 0 4px;
+      font-size: 0.85em;
+      font-family: var(--vscode-editor-font-family, monospace);
+      border: 1px solid var(--vscode-widget-border, #444);
+      border-radius: 3px;
+      background: var(--vscode-keybindingLabel-background, rgba(128,128,128,0.17));
+      color: var(--vscode-keybindingLabel-foreground, inherit);
+    }
+    .hint kbd { margin: 0 2px; }
+    .commit-hint { margin: 6px 0 0 0; }
     #diff-view { margin-top:12px; outline:none; }
     #diff-view:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
@@ -295,6 +325,11 @@ export class HistoryPanel {
     </thead>
     <tbody>${rows}</tbody>
   </table>
+  <p class="hint commit-hint">
+    <kbd>↑↓</kbd> 移動 ·
+    <kbd>Enter</kbd> ファイル一覧へ ·
+    <kbd>m</kbd> マージ表示
+  </p>
   <div id="file-list"></div>
   <div id="diff-view" tabindex="0"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
