@@ -90,7 +90,8 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     table.commit-table tbody tr:hover { background-color:var(--vscode-list-hoverBackground); }
     table.commit-table tbody tr.selected { background-color:var(--vscode-list-activeSelectionBackground);color:var(--vscode-list-activeSelectionForeground); }
     table.commit-table tbody tr:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
-    #diff-view { margin-top:12px; }
+    #diff-view { margin-top:12px; outline:none; }
+    #diff-view:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
     .split-diff { font-family:monospace;font-size:1.15em; }
     .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid transparent; }
@@ -111,7 +112,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  <div id="diff-view"></div>
+  <div id="diff-view" tabindex="0"></div>
   <script nonce="${fileNonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
@@ -263,7 +264,8 @@ export class HistoryPanel {
     #file-list li.selected { background-color:rgba(80,200,120,0.25);color:var(--vscode-foreground); }
     #file-list li:focus { background-color:var(--vscode-list-focusBackground,rgba(80,200,120,0.4));outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     .hint { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0 0 0; }
-    #diff-view { margin-top:12px; }
+    #diff-view { margin-top:12px; outline:none; }
+    #diff-view:focus { outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     #diff-view h3 { margin:0 0 4px 0;font-size:var(--vscode-font-size); }
     #diff-view pre {
       margin:0;
@@ -296,7 +298,7 @@ export class HistoryPanel {
     <tbody>${rows}</tbody>
   </table>
   <div id="file-list"></div>
-  <div id="diff-view"></div>
+  <div id="diff-view" tabindex="0"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;

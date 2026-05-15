@@ -34,6 +34,20 @@ declare function acquireVsCodeApi(): {
   document.addEventListener('keydown', (e: KeyboardEvent) => {
     const active = document.activeElement;
     const inFileList = active && active.closest('#file-list');
+    const inDiff = active && (active as HTMLElement).id === 'diff-view';
+
+    if (inDiff) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
+      if (e.key === 'PageDown')  { e.preventDefault(); window.scrollBy({ top: window.innerHeight * 0.8 }); return; }
+      if (e.key === 'PageUp')    { e.preventDefault(); window.scrollBy({ top: -window.innerHeight * 0.8 }); return; }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (selectedFileItem) { (selectedFileItem as HTMLElement).focus(); }
+        return;
+      }
+      return;
+    }
 
     if (e.key === 'Escape' && !inFileList) {
       if (tbody) { tbody.focus(); }
@@ -96,6 +110,12 @@ declare function acquireVsCodeApi(): {
         li.addEventListener('keydown', (e: KeyboardEvent) => {
           if (e.key === 'h') {
             vscode.postMessage({ command: 'showFileLog', filePath: f });
+          }
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const dv = document.getElementById('diff-view') as HTMLElement | null;
+            if (dv) { dv.focus(); dv.scrollIntoView({ block: 'start' }); }
+            return;
           }
           if (e.key === 'Escape') {
             e.preventDefault();
