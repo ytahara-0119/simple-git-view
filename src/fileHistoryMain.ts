@@ -27,9 +27,36 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     const target = e.target as HTMLElement | null;
     const tag = target && target.tagName ? target.tagName.toLowerCase() : '';
     const isEditable = tag === 'input' || tag === 'textarea';
+    const active = document.activeElement as HTMLElement | null;
+    const inDiff = active && active.id === 'diff-view';
+
+    if (inDiff) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
+      if (e.key === 'PageDown')  { e.preventDefault(); window.scrollBy({ top: window.innerHeight * 0.8 }); return; }
+      if (e.key === 'PageUp')    { e.preventDefault(); window.scrollBy({ top: -window.innerHeight * 0.8 }); return; }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (selectedRow) { selectedRow.focus(); }
+        return;
+      }
+      if (e.key === 'q' && !isEditable) {
+        e.preventDefault();
+        vscode.postMessage({ command: 'close' });
+        return;
+      }
+      return;
+    }
+
     if (e.key === 'q' && !isEditable) {
       e.preventDefault();
       vscode.postMessage({ command: 'close' });
+      return;
+    }
+    if (e.key === 'Enter' && selectedRow) {
+      e.preventDefault();
+      const dv = document.getElementById('diff-view') as HTMLElement | null;
+      if (dv) { dv.focus(); dv.scrollIntoView({ block: 'start' }); }
       return;
     }
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
