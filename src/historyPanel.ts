@@ -23,7 +23,7 @@ const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();
 export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscode.Uri): void {
   const existing = fileHistoryPanels.get(filePath);
   if (existing) {
-    existing.reveal(vscode.ViewColumn.One);
+    existing.reveal(vscode.ViewColumn.Beside);
     return;
   }
   const commits = getFileLog(cwd, filePath);
@@ -31,7 +31,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   const panel = vscode.window.createWebviewPanel(
     'simpleGitViewFileHistory',
     `${filePath} — 履歴`,
-    vscode.ViewColumn.One,
+    vscode.ViewColumn.Beside,
     {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'out')],
@@ -137,19 +137,19 @@ export class HistoryPanel {
   private readonly extensionUri: vscode.Uri;
 
   reveal(): void {
-    this.panel.reveal(vscode.ViewColumn.One);
+    this.panel.reveal(vscode.ViewColumn.Beside);
   }
 
   static show(cwd: string, context: vscode.ExtensionContext): void {
     if (HistoryPanel.currentPanel) {
-      HistoryPanel.currentPanel.panel.reveal(vscode.ViewColumn.One);
+      HistoryPanel.currentPanel.panel.reveal(vscode.ViewColumn.Beside);
       return;
     }
 
     const panel = vscode.window.createWebviewPanel(
       'simpleGitViewHistory',
       'Git History',
-      vscode.ViewColumn.One,
+      vscode.ViewColumn.Beside,
       {
         enableScripts: true,
         localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, 'out')],
