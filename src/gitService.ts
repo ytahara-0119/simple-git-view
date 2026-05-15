@@ -143,6 +143,19 @@ export function getFileLog(cwd: string, filePath: string): Commit[] {
   }
 }
 
+export function isTrackedFile(cwd: string, filePath: string): boolean {
+  try {
+    execFileSync('git', ['ls-files', '--error-unmatch', '--', filePath], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'ignore', 'ignore'],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getBlameLines(cwd: string, filePath: string): BlameLine[] {
   try {
     const output = runGit(cwd, ['blame', '--porcelain', '--', filePath]);

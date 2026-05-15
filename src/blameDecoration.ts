@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { getBlameLinesAsync, BlameLine } from './gitService';
+import { getBlameLinesAsync, isTrackedFile, BlameLine } from './gitService';
 
 interface CacheEntry {
   mtimeMs: number;
@@ -31,6 +31,11 @@ export class BlameDecorationProvider {
     }
     const filePath = editor.document.uri.fsPath;
     const cwd = path.dirname(filePath);
+
+    if (!isTrackedFile(cwd, filePath)) {
+      editor.setDecorations(this.decorationType, []);
+      return;
+    }
 
     let mtimeMs = 0;
     try {

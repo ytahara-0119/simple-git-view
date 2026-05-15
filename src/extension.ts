@@ -28,6 +28,15 @@ export function activate(context: vscode.ExtensionContext) {
       if (editor) { blameProvider.applyBlame(editor); }
     })
   );
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument(doc => {
+      blameProvider.invalidate(doc.uri.fsPath);
+      const editor = vscode.window.activeTextEditor;
+      if (editor && editor.document === doc) {
+        blameProvider.applyBlame(editor);
+      }
+    })
+  );
 
   // 3. コミット履歴コマンド
   context.subscriptions.push(
