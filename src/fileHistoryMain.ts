@@ -11,6 +11,15 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     return all.filter(r => r.offsetParent !== null);
   }
 
+  function updateStatusLine(): void {
+    const hidden = document.body.classList.contains('hide-merges');
+    const total = document.body.dataset.totalCount || '?';
+    const ms = document.querySelector('.merge-status');
+    const cc = document.querySelector('.commit-count');
+    if (ms) { ms.textContent = hidden ? 'Merges: hidden (m)' : 'Merges: shown (m)'; }
+    if (cc) { cc.textContent = 'Showing ' + visibleRows().length + ' / total: ' + total; }
+  }
+
   function selectRow(row: HTMLElement): void {
     if (!row) { return; }
     if (selectedRow) { selectedRow.classList.remove('selected'); }
@@ -65,6 +74,7 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
         const firstVisible = visibleRows()[0];
         if (firstVisible) { selectRow(firstVisible); }
       }
+      updateStatusLine();
       return;
     }
     if (e.key === 'Enter' && selectedRow) {
@@ -101,6 +111,8 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     const firstRow = visibleRows()[0];
     if (firstRow) { selectRow(firstRow); }
   }
+
+  updateStatusLine();
 
   function escapeHtml(s: string): string {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

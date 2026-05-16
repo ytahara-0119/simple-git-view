@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getCommitLog, getCommitFiles, getFileLog, getFileDiff } from './gitService';
+import { getCommitLog, getCommitFiles, getFileLog, getFileDiff, getTotalCommitCount } from './gitService';
 
 function getNonce(): string {
   let text = '';
@@ -28,6 +28,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     return;
   }
   const commits = getFileLog(cwd, filePath);
+  const totalCount = getTotalCommitCount(cwd, filePath);
   const fileNonce = getNonce();
   const panel = vscode.window.createWebviewPanel(
     'simpleGitViewFileHistory',
@@ -102,6 +103,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     .split-diff .cell.diff-add { background:rgba(78,201,78,0.18); }
     .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
     .hint { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0 8px 0; }
+    .status-line { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0; }
     kbd {
       display: inline-block;
       padding: 0 4px;
@@ -115,7 +117,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     .hint kbd { margin: 0 2px; }
   </style>
 </head>
-<body class="hide-merges">
+<body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <h3>${escapeHtml(filePath)}</h3>
   <p class="hint">
     <kbd>↑↓</kbd> 移動 ·
@@ -127,6 +129,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>
+  <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
   <div id="diff-view" tabindex="0"></div>
   <script nonce="${fileNonce}" src="${scriptUri}"></script>
 </body>
@@ -217,6 +220,7 @@ export class HistoryPanel {
       vscode.Uri.joinPath(this.extensionUri, 'out', 'webviewMain.js')
     );
     const commits = getCommitLog(this.cwd);
+    const totalCount = getTotalCommitCount(this.cwd);
 
     const rows = commits
       .map(commit => {
@@ -285,6 +289,7 @@ export class HistoryPanel {
     #file-list li.selected { background-color:rgba(80,200,120,0.25);color:var(--vscode-foreground); }
     #file-list li:focus { background-color:var(--vscode-list-focusBackground,rgba(80,200,120,0.4));outline:1px solid var(--vscode-focusBorder,#007acc);outline-offset:-1px; }
     .hint { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0 0 0; }
+    .status-line { font-size:0.85em;color:var(--vscode-descriptionForeground);margin:4px 0; }
     kbd {
       display: inline-block;
       padding: 0 4px;
@@ -323,7 +328,7 @@ export class HistoryPanel {
     .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
   </style>
 </head>
-<body class="hide-merges">
+<body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <table class="commit-table">
     <thead>
       <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
@@ -335,6 +340,7 @@ export class HistoryPanel {
     <kbd>Enter</kbd> ファイル一覧へ ·
     <kbd>m</kbd> マージ表示
   </p>
+  <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
   <div id="file-list"></div>
   <div id="diff-view" tabindex="0"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>

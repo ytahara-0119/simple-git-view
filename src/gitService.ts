@@ -143,6 +143,19 @@ export function getFileLog(cwd: string, filePath: string): Commit[] {
   }
 }
 
+export function getTotalCommitCount(cwd: string, filePath?: string): number {
+  try {
+    const args = ['rev-list', '--count', 'HEAD'];
+    if (filePath) { args.push('--', filePath); }
+    const output = runGit(cwd, args).trim();
+    const n = parseInt(output, 10);
+    return Number.isNaN(n) ? 0 : n;
+  } catch (err) {
+    logError('getTotalCommitCount', err);
+    return 0;
+  }
+}
+
 export function isTrackedFile(cwd: string, filePath: string): boolean {
   try {
     execFileSync('git', ['ls-files', '--error-unmatch', '--', filePath], {
