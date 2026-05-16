@@ -21,9 +21,10 @@ function escapeHtml(s: string): string {
 const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();
 
 export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscode.Uri): void {
+  const targetColumn = HistoryPanel.currentPanel?.viewColumn ?? vscode.ViewColumn.Beside;
   const existing = fileHistoryPanels.get(filePath);
   if (existing) {
-    existing.reveal(vscode.ViewColumn.Beside);
+    existing.reveal(targetColumn);
     return;
   }
   const commits = getFileLog(cwd, filePath);
@@ -31,7 +32,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   const panel = vscode.window.createWebviewPanel(
     'simpleGitViewFileHistory',
     `${filePath} — 履歴`,
-    vscode.ViewColumn.Beside,
+    targetColumn,
     {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'out')],
@@ -156,6 +157,10 @@ export class HistoryPanel {
 
   reveal(): void {
     this.panel.reveal(vscode.ViewColumn.Beside);
+  }
+
+  get viewColumn(): vscode.ViewColumn | undefined {
+    return this.panel.viewColumn;
   }
 
   static show(cwd: string, context: vscode.ExtensionContext): void {
