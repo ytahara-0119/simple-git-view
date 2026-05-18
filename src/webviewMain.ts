@@ -197,7 +197,7 @@ declare function acquireVsCodeApi(): {
         container.innerHTML = '<h3>' + escapeHtml(msg.filePath || '') + ' — diff</h3><p>差分なし</p>';
         return;
       }
-      container.innerHTML = '<h3>' + escapeHtml(msg.filePath || '') + ' — diff</h3>' + renderSplitDiff(msg.diff);
+      container.innerHTML = '<h3>🔍 ' + escapeHtml(msg.filePath || '') + ' — diff</h3>' + renderSplitDiff(msg.diff);
     }
   });
 
