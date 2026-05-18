@@ -20,7 +20,7 @@ export class StatusBarBranch {
 
   update(): void {
     const branch = getCurrentBranch(this.cwd);
-    this.item.text = branch ? `$(git-branch) ${branch}` : '';
+    this.item.text = branch ? `🌸 ${branch}` : '';
     if (!branch) {
       this.item.hide();
     } else {
