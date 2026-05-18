@@ -18,55 +18,54 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-// Figmaデザイン共通CSS（get_design_context の実測値に準拠）
+// Figmaデザイン共通CSS（タブバー・スペーシング・カラー）
 const FIGMA_STYLE = `
-    body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:#1e2939;background:linear-gradient(142deg,rgb(250,245,255) 0%,rgb(253,242,248) 100%);margin:0;padding:0; }
-    .tab-bar { background:linear-gradient(to right,#c27aff,#fb64b6,#ff637e);color:#ffffff;padding:12px 24px;font-size:14px;font-weight:600;box-shadow:0 10px 8px -6px rgba(0,0,0,0.1); }
+    body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:#cccccc;background-color:#1e1e2e;margin:0;padding:0; }
+    .tab-bar { background:linear-gradient(135deg,#ff6b9d 0%,#c44dff 100%);color:#ffffff;padding:12px 24px;font-size:14px;font-weight:bold; }
     .panel-section { padding:16px 24px; }
-    table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
+    table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed; }
     table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
     table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
     table.commit-table tbody { max-height:280px;overflow-y:auto; }
-    table.commit-table thead tr { background:linear-gradient(to right,#e9d4ff,#fccee8);color:#59168b; }
-    table.commit-table th, table.commit-table td { padding:6px 8px;text-align:left;border-bottom:1px solid #f3e8ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-    table.commit-table .col-hash { width:80px;font-family:monospace;color:#9810fa; }
-    table.commit-table .col-msg { width:auto;white-space:nowrap;color:#1e2939; }
+    table.commit-table thead tr { background-color:rgba(255,255,255,0.06); }
+    table.commit-table th, table.commit-table td { padding:6px 8px;text-align:left;border-bottom:1px solid #444;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    table.commit-table .col-hash { width:80px;font-family:monospace; }
+    table.commit-table .col-msg { width:auto;white-space:nowrap; }
     table.commit-table .col-stat { width:90px;font-family:monospace; }
-    table.commit-table .ins { color:#00c950;font-weight:bold; }
-    table.commit-table .del { color:#ff2056;margin-left:4px; }
-    table.commit-table .col-author { width:140px;color:#364153; }
-    table.commit-table .col-date { width:130px;color:#6a7282; }
-    table.commit-table tbody tr:hover { background-color:rgba(255,255,255,0.5); }
-    table.commit-table tbody tr.selected { background:linear-gradient(to right,#dbeafe,#cefafe); }
-    table.commit-table tbody tr:focus { outline:2px solid #c27aff;outline-offset:-2px; }
+    table.commit-table .ins { color:#3fb950; }
+    table.commit-table .del { color:#f85149;margin-left:4px; }
+    table.commit-table .col-author { width:140px; }
+    table.commit-table .col-date { width:130px; }
+    table.commit-table tbody tr:hover { background-color:rgba(255,255,255,0.05); }
+    table.commit-table tbody tr.selected { background-color:rgba(0,122,204,0.35);color:#ffffff; }
+    table.commit-table tbody tr:focus { outline:1px solid #007acc;outline-offset:-1px; }
     body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
     #file-list { margin-top:4px; }
-    #file-list h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size);color:#1e2939; }
-    #file-list ul { margin:0;padding-left:0;display:flex;flex-direction:column;gap:6px; }
-    #file-list li { font-family:monospace;padding:8px 16px;cursor:pointer;outline:none;list-style:none;border-radius:14px;background:rgba(255,255,255,0.6);color:#1e2939;font-size:14px; }
-    #file-list li:hover { background:rgba(255,255,255,0.85); }
-    #file-list li.selected { background:linear-gradient(to right,#a4f4cf,#96f7e4);color:#1e2939;font-weight:600;box-shadow:0 4px 3px rgba(0,0,0,0.1); }
-    #file-list li:focus { background:rgba(255,255,255,0.85);outline:2px solid #c27aff;outline-offset:-2px; }
-    .hint { display:inline-flex;align-items:center;font-size:0.85em;color:#9810fa;margin:8px 0 0 0;background:#f3e8ff;padding:4px 14px;border-radius:999px; }
-    .status-line { display:inline-flex;align-items:center;font-size:0.85em;color:#e60076;margin:6px 0 0 6px;background:#fce7f3;padding:4px 14px;border-radius:999px; }
-    .commit-hint { margin:8px 0 0 0; }
-    .file-hint { display:inline-flex;align-items:center;font-size:0.85em;color:#009689;margin:8px 0 0 0;background:#cbfbf1;padding:4px 14px;border-radius:999px; }
-    kbd { display:inline-block;padding:0 4px;font-size:0.85em;font-family:monospace;border:1px solid #d8b4fe;border-radius:3px;background:rgba(194,122,255,0.15);color:#7c3aed; }
+    #file-list h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size); }
+    #file-list ul { margin:0;padding-left:0; }
+    #file-list li { font-family:monospace;padding:8px 4px;cursor:pointer;outline:none;list-style:none; }
+    #file-list li:hover { background-color:rgba(255,255,255,0.05); }
+    #file-list li.selected { background-color:rgba(80,200,120,0.25);color:#cccccc; }
+    #file-list li:focus { background-color:rgba(80,200,120,0.4);outline:1px solid #007acc;outline-offset:-1px; }
+    .hint { font-size:0.85em;color:#888;margin:8px 0 0 0; }
+    .status-line { font-size:0.85em;color:#888;margin:4px 0; }
+    kbd { display:inline-block;padding:0 4px;font-size:0.85em;font-family:monospace;border:1px solid #555;border-radius:3px;background:rgba(128,128,128,0.2);color:#ccc; }
     .hint kbd { margin:0 2px; }
+    .commit-hint { margin:8px 0 0 0; }
     #diff-view { padding:0 24px 16px;outline:none; }
-    #diff-view:focus { outline:2px solid #c27aff;outline-offset:-2px; }
-    #diff-view h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size);color:#1e2939; }
+    #diff-view:focus { outline:1px solid #007acc;outline-offset:-1px; }
+    #diff-view h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size); }
     .split-diff { font-family:monospace;font-size:1.15em; }
-    .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid #f3e8ff; }
-    .split-diff .row.meta, .split-diff .row.hunk { grid-template-columns:1fr;color:#9810fa;background:#f3e8ff; }
+    .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid transparent; }
+    .split-diff .row.meta, .split-diff .row.hunk { grid-template-columns:1fr;color:#888;background:rgba(255,255,255,0.04); }
     .split-diff .meta-content { padding:1px 6px;white-space:pre;overflow-x:auto; }
-    .split-diff .ln { text-align:right;padding:1px 8px;color:#9810fa;background:rgba(243,232,255,0.4);user-select:none;border-right:1px solid #f3e8ff; }
+    .split-diff .ln { text-align:right;padding:1px 8px;color:#585858;background:#1e1e2e;user-select:none;border-right:1px solid #444; }
     .split-diff .cell { padding:1px 6px;white-space:pre;overflow-x:auto;min-width:0;scrollbar-width:thin; }
     .split-diff .cell::-webkit-scrollbar { height:6px; }
-    .split-diff .cell::-webkit-scrollbar-thumb { background:rgba(194,122,255,0.3); }
-    .split-diff .cell.diff-del { background:rgba(255,32,86,0.12); }
-    .split-diff .cell.diff-add { background:rgba(0,201,80,0.12); }
-    .split-diff .cell.diff-empty { background:rgba(194,122,255,0.06); }
+    .split-diff .cell::-webkit-scrollbar-thumb { background:rgba(128,128,128,0.3); }
+    .split-diff .cell.diff-del { background:rgba(244,71,71,0.18); }
+    .split-diff .cell.diff-add { background:rgba(78,201,78,0.18); }
+    .split-diff .cell.diff-empty { background:rgba(128,128,128,0.08); }
 `;
 
 const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();
@@ -124,7 +123,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴</div>
   <div class="panel-section">
-    <p class="hint commit-hint">
+    <p class="hint">
       <kbd>↑↓</kbd> 移動 ·
       <kbd>Enter</kbd> diff へ ·
       <kbd>m</kbd> マージ表示 ·
@@ -266,12 +265,15 @@ export class HistoryPanel {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <p class="hint commit-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>m</kbd> マージ表示</p>
+    <p class="hint commit-hint">
+      <kbd>↑↓</kbd> 移動 ·
+      <kbd>Enter</kbd> ファイル一覧へ ·
+      <kbd>m</kbd> マージ表示
+    </p>
     <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
   </div>
   <div class="panel-section">
     <div id="file-list"></div>
-    <p class="file-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> diff · <kbd>h</kbd> ファイル履歴 · <kbd>Esc</kbd> コミット一覧へ</p>
   </div>
   <div id="diff-view" tabindex="0"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
