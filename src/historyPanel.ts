@@ -69,6 +69,49 @@ const FIGMA_STYLE = `
     .split-diff .cell.diff-empty { background:rgba(194,122,255,0.06); }
 `;
 
+// File History Panel 専用CSS（Figma水色テーマ: get_design_context 実測値）
+const FILE_HISTORY_STYLE = `
+    body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:#1e2939;background:linear-gradient(144deg,#eff6ff 0%,#eef2ff 100%);margin:0;padding:0; }
+    .tab-bar { background:linear-gradient(to right,#51a2ff,#7c86ff,#c27aff);color:#ffffff;padding:12px 24px;font-size:14px;font-weight:600;box-shadow:0 10px 8px -6px rgba(0,0,0,0.1); }
+    .panel-section { padding:16px 24px; }
+    table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
+    table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
+    table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
+    table.commit-table tbody { max-height:280px;overflow-y:auto; }
+    table.commit-table thead tr { background:linear-gradient(to right,#bedbff,#c6d2ff);color:#1c398e; }
+    table.commit-table th, table.commit-table td { padding:6px 8px;text-align:left;border-bottom:1px solid #dbeafe;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    table.commit-table .col-hash { width:80px;font-family:monospace;color:#155dfc; }
+    table.commit-table .col-msg { width:auto;white-space:nowrap;color:#1e2939; }
+    table.commit-table .col-stat { width:90px;font-family:monospace; }
+    table.commit-table .ins { color:#00c950;font-weight:bold; }
+    table.commit-table .del { color:#ff2056;margin-left:4px; }
+    table.commit-table .col-author { width:140px;color:#364153; }
+    table.commit-table .col-date { width:130px;color:#6a7282; }
+    table.commit-table tbody tr:hover { background-color:rgba(255,255,255,0.5); }
+    table.commit-table tbody tr.selected { background:linear-gradient(to right,#cefafe,#dbeafe);color:#155dfc; }
+    table.commit-table tbody tr:focus { outline:2px solid #51a2ff;outline-offset:-2px; }
+    body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
+    .hint { display:inline-flex;align-items:center;font-size:0.85em;color:#4f39f6;margin:8px 0 0 0;background:#e0e7ff;padding:4px 14px;border-radius:999px; }
+    .status-line { display:inline-flex;align-items:center;font-size:0.85em;color:#155dfc;margin:6px 0 0 6px;background:#dbeafe;padding:4px 14px;border-radius:999px; }
+    .commit-hint { margin:8px 0 0 0; }
+    kbd { display:inline-block;padding:0 4px;font-size:0.85em;font-family:monospace;border:1px solid #a5b4fc;border-radius:3px;background:rgba(99,102,241,0.1);color:#4338ca; }
+    .hint kbd { margin:0 2px; }
+    #diff-view { padding:0 24px 16px;outline:none; }
+    #diff-view:focus { outline:2px solid #51a2ff;outline-offset:-2px; }
+    #diff-view h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size);color:#1e2939; }
+    .split-diff { font-family:monospace;font-size:1.15em; }
+    .split-diff .row { display:grid;grid-template-columns:40px 1fr 40px 1fr;border-bottom:1px solid #dbeafe; }
+    .split-diff .row.meta, .split-diff .row.hunk { grid-template-columns:1fr;color:#4f39f6;background:#e0e7ff; }
+    .split-diff .meta-content { padding:1px 6px;white-space:pre;overflow-x:auto; }
+    .split-diff .ln { text-align:right;padding:1px 8px;color:#7c86ff;background:rgba(224,231,255,0.4);user-select:none;border-right:1px solid #dbeafe; }
+    .split-diff .cell { padding:1px 6px;white-space:pre;overflow-x:auto;min-width:0;scrollbar-width:thin; }
+    .split-diff .cell::-webkit-scrollbar { height:6px; }
+    .split-diff .cell::-webkit-scrollbar-thumb { background:rgba(124,134,255,0.3); }
+    .split-diff .cell.diff-del { background:rgba(255,32,86,0.12); }
+    .split-diff .cell.diff-add { background:rgba(0,201,80,0.12); }
+    .split-diff .cell.diff-empty { background:rgba(124,134,255,0.06); }
+`;
+
 const fileHistoryPanels = new Map<string, vscode.WebviewPanel>();
 
 export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri: vscode.Uri): void {
@@ -119,7 +162,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' ${csp}; script-src 'nonce-${fileNonce}' ${csp};">
   <title>${escapeHtml(filePath)} — 履歴</title>
-  <style>${FIGMA_STYLE}</style>
+  <style>${FILE_HISTORY_STYLE}</style>
 </head>
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴</div>
