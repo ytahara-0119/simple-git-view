@@ -233,3 +233,22 @@ export function getFileDiff(cwd: string, hash: string, filePath: string): string
     }
   }
 }
+
+export function getCommitRangeFiles(cwd: string, hash1: string, hash2: string): string[] {
+  try {
+    const output = runGit(cwd, ['diff', '--name-only', hash1, hash2]);
+    return output.split('\n').filter(line => line.length > 0);
+  } catch (err) {
+    logError('getCommitRangeFiles', err);
+    return [];
+  }
+}
+
+export function getCommitRangeDiff(cwd: string, hash1: string, hash2: string, filePath: string): string {
+  try {
+    return runGit(cwd, ['diff', hash1, hash2, '--', filePath]);
+  } catch (err) {
+    logError('getCommitRangeDiff', err);
+    return '';
+  }
+}

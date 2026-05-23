@@ -9,6 +9,8 @@ declare function acquireVsCodeApi(): {
   let selectedFileItem: Element | null = null;
   let currentHash: string | null = null;
   let focusFileListAfterRender = false;
+  let markedHash: string | null = null;
+  let markedRow: HTMLElement | null = null;
 
   const tbody = document.querySelector('tbody') as HTMLElement | null;
   if (tbody) {
@@ -42,7 +44,17 @@ declare function acquireVsCodeApi(): {
     const dv = document.getElementById('diff-view');
     if (dv) { dv.innerHTML = ''; }
     selectedFileItem = null;
-    vscode.postMessage({ command: 'showFiles', hash: currentHash });
+
+    if (markedHash && currentHash && markedHash !== currentHash && markedRow) {
+      const rows = visibleRows();
+      const markedIdx = rows.indexOf(markedRow as HTMLElement);
+      const selectedIdx = rows.indexOf(row);
+      const fromHash = markedIdx > selectedIdx ? markedHash : currentHash;
+      const toHash = markedIdx > selectedIdx ? currentHash : markedHash;
+      vscode.postMessage({ command: 'showRangeFiles', fromHash, toHash });
+    } else {
+      vscode.postMessage({ command: 'showFiles', hash: currentHash });
+    }
   }
 
   document.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -101,6 +113,22 @@ declare function acquireVsCodeApi(): {
           focusFileListAfterRender = true;
         }
       }
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (!selectedCommitRow) { return; }
+        if (markedRow === selectedCommitRow) {
+          (markedRow as HTMLElement).classList.remove('marked');
+          markedRow = null;
+          markedHash = null;
+          if (currentHash) { vscode.postMessage({ command: 'showFiles', hash: currentHash }); }
+        } else {
+          if (markedRow) { (markedRow as HTMLElement).classList.remove('marked'); }
+          markedRow = selectedCommitRow as HTMLElement;
+          markedHash = currentHash;
+          (markedRow as HTMLElement).classList.add('marked');
+        }
+        return;
+      }
     }
   });
 
@@ -135,7 +163,14 @@ declare function acquireVsCodeApi(): {
           if (selectedFileItem) { selectedFileItem.classList.remove('selected'); }
           li.classList.add('selected');
           selectedFileItem = li;
-          if (currentHash) {
+          if (markedHash && currentHash && markedHash !== currentHash && markedRow) {
+            const rows = visibleRows();
+            const markedIdx = rows.indexOf(markedRow as HTMLElement);
+            const selectedIdx = selectedCommitRow ? rows.indexOf(selectedCommitRow as HTMLElement) : -1;
+            const fromHash = markedIdx > selectedIdx ? markedHash : currentHash;
+            const toHash = markedIdx > selectedIdx ? currentHash : markedHash;
+            vscode.postMessage({ command: 'showRangeFileDiff', fromHash, toHash, filePath: f });
+          } else if (currentHash) {
             vscode.postMessage({ command: 'showFileDiff', hash: currentHash, filePath: f });
           }
         });
