@@ -4,6 +4,8 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
 (function () {
   const vscode = acquireVsCodeApi();
   let selectedRow: HTMLElement | null = null;
+  let markedHash: string | null = null;
+  let markedRow: HTMLElement | null = null;
   const tbody = document.querySelector('tbody') as HTMLElement;
 
   function visibleRows(): HTMLElement[] {
@@ -27,7 +29,20 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     selectedRow = row;
     row.focus();
     row.scrollIntoView({ block: 'nearest' });
-    vscode.postMessage({ command: 'showDiff', hash: row.getAttribute('data-hash'), filePath: row.getAttribute('data-filepath') });
+
+    const hash = row.getAttribute('data-hash');
+    const filePath = row.getAttribute('data-filepath');
+
+    if (markedHash && hash && markedHash !== hash && markedRow) {
+      const rows = visibleRows();
+      const markedIdx = rows.indexOf(markedRow as HTMLElement);
+      const selectedIdx = rows.indexOf(row);
+      const fromHash = markedIdx > selectedIdx ? markedHash : hash;
+      const toHash = markedIdx > selectedIdx ? hash : markedHash;
+      vscode.postMessage({ command: 'showRangeDiff', fromHash, toHash, filePath });
+    } else {
+      vscode.postMessage({ command: 'showDiff', hash, filePath });
+    }
   }
 
   if (tbody) {
@@ -67,6 +82,26 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       vscode.postMessage({ command: 'close' });
       return;
     }
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (!selectedRow) { return; }
+      const hash = selectedRow.getAttribute('data-hash');
+      if (markedRow === selectedRow) {
+        (markedRow as HTMLElement).classList.remove('marked');
+        markedRow = null;
+        markedHash = null;
+        if (hash) {
+          const filePath = selectedRow.getAttribute('data-filepath');
+          vscode.postMessage({ command: 'showDiff', hash, filePath });
+        }
+      } else {
+        if (markedRow) { (markedRow as HTMLElement).classList.remove('marked'); }
+        markedRow = selectedRow;
+        markedHash = hash;
+        markedRow.classList.add('marked');
+      }
+      return;
+    }
     if (e.key === 'm') {
       e.preventDefault();
       document.body.classList.toggle('hide-merges');
@@ -94,15 +129,16 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
   });
 
   window.addEventListener('message', (event: MessageEvent) => {
-    const msg = event.data as { command: string; diff?: string; filePath?: string };
+    const msg = event.data as { command: string; diff?: string; filePath?: string; title?: string };
     if (msg.command === 'renderDiff') {
       const container = document.getElementById('diff-view');
       if (!container) { return; }
+      const titleText = msg.title ? escapeHtml(msg.title) : escapeHtml(msg.filePath || '') + ' — diff';
       if (!msg.diff) {
-        container.innerHTML = '<h3>' + escapeHtml(msg.filePath || '') + ' — diff</h3><p>差分なし</p>';
+        container.innerHTML = '<h3>' + titleText + '</h3><p>差分なし</p>';
         return;
       }
-      container.innerHTML = '<h3>🔍 ' + escapeHtml(msg.filePath || '') + ' — diff</h3>' + renderSplitDiff(msg.diff);
+      container.innerHTML = '<h3>🔍 ' + titleText + '</h3>' + renderSplitDiff(msg.diff);
     }
   });
 
