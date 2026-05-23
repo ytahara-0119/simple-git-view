@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getCommitLog, getCommitFiles, getFileLog, getFileDiff, getTotalCommitCount } from './gitService';
+import { getCommitLog, getCommitFiles, getFileLog, getFileDiff, getTotalCommitCount, getCommitRangeFiles, getCommitRangeDiff } from './gitService';
 
 function getNonce(): string {
   let text = '';
@@ -38,6 +38,8 @@ const FIGMA_STYLE = `
     table.commit-table .col-date { width:130px;color:#6a7282; }
     table.commit-table tbody tr:hover { background-color:rgba(255,255,255,0.5); }
     table.commit-table tbody tr.selected { background:linear-gradient(to right,#dbeafe,#cefafe); }
+    table.commit-table tbody tr.marked { background: linear-gradient(to right,#fef9c3,#fef08a); color:#854d0e; }
+    table.commit-table tbody tr.marked.selected { background: linear-gradient(to right,#fed7aa,#fde68a); color:#78350f; }
     table.commit-table tbody tr:focus { outline:2px solid #c27aff;outline-offset:-2px; }
     body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
     #file-list { margin-top:4px; }
@@ -248,7 +250,7 @@ export class HistoryPanel {
     });
   }
 
-  private handleMessage(msg: { command: string; hash?: string; filePath?: string }): void {
+  private handleMessage(msg: { command: string; hash?: string; filePath?: string; fromHash?: string; toHash?: string }): void {
     if (msg.command === 'showFiles' && msg.hash) {
       const files = getCommitFiles(this.cwd, msg.hash);
       this.panel.webview.postMessage({ command: 'renderFiles', files, hash: msg.hash });
@@ -261,6 +263,22 @@ export class HistoryPanel {
 
     if (msg.command === 'showFileLog' && msg.filePath) {
       openFileHistoryPanel(this.cwd, msg.filePath, this.extensionUri);
+    }
+
+    if (msg.command === 'showRangeFiles' && msg.fromHash && msg.toHash) {
+      const files = getCommitRangeFiles(this.cwd, msg.fromHash, msg.toHash);
+      this.panel.webview.postMessage({
+        command: 'renderFiles',
+        files,
+        hash: `${(msg.fromHash as string).slice(0, 7)}..${(msg.toHash as string).slice(0, 7)}`,
+        fromHash: msg.fromHash,
+        toHash: msg.toHash,
+      });
+    }
+
+    if (msg.command === 'showRangeFileDiff' && msg.fromHash && msg.toHash && msg.filePath) {
+      const diff = getCommitRangeDiff(this.cwd, msg.fromHash, msg.toHash, msg.filePath as string);
+      this.panel.webview.postMessage({ command: 'renderDiff', diff, filePath: msg.filePath });
     }
   }
 
@@ -311,7 +329,7 @@ export class HistoryPanel {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <p class="hint commit-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>m</kbd> マージ表示</p>
+    <p class="hint commit-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示</p>
     <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
   </div>
   <div class="panel-section">
