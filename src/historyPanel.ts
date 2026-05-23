@@ -92,6 +92,8 @@ const FILE_HISTORY_STYLE = `
     table.commit-table .col-date { width:130px;color:#6a7282; }
     table.commit-table tbody tr:hover { background-color:rgba(255,255,255,0.5); }
     table.commit-table tbody tr.selected { background:linear-gradient(to right,#cefafe,#dbeafe);color:#155dfc; }
+    table.commit-table tbody tr.marked { background: linear-gradient(to right,#fef9c3,#fef08a); color:#854d0e; }
+    table.commit-table tbody tr.marked.selected { background: linear-gradient(to right,#fed7aa,#fde68a); color:#78350f; }
     table.commit-table tbody tr:focus { outline:2px solid #51a2ff;outline-offset:-2px; }
     body.hide-merges table.commit-table tbody tr.is-merge { display:none; }
     .hint { display:inline-flex;align-items:center;font-size:0.85em;color:#4f39f6;margin:8px 0 0 0;background:#e0e7ff;padding:4px 14px;border-radius:999px; }
@@ -173,6 +175,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   <div class="panel-section">
     <p class="hint commit-hint">
       <kbd>↑↓</kbd> 移動 ·
+      <kbd>Space</kbd> マーク ·
       <kbd>Enter</kbd> diff へ ·
       <kbd>m</kbd> マージ表示 ·
       <kbd>q</kbd> 閉じる
@@ -192,6 +195,13 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     if (msg.command === 'showDiff' && msg.hash && msg.filePath) {
       const diff = getFileDiff(cwd, msg.hash, msg.filePath);
       panel.webview.postMessage({ command: 'renderDiff', diff, filePath: msg.filePath });
+    }
+    if (msg.command === 'showRangeDiff' && msg.fromHash && msg.toHash && msg.filePath) {
+      const diff = getCommitRangeDiff(cwd, msg.fromHash as string, msg.toHash as string, msg.filePath as string);
+      const shortFrom = (msg.fromHash as string).slice(0, 7);
+      const shortTo = (msg.toHash as string).slice(0, 7);
+      const title = `${shortFrom}..${shortTo} — ${msg.filePath as string}`;
+      panel.webview.postMessage({ command: 'renderDiff', diff, filePath: msg.filePath, title });
     }
     if (msg.command === 'close') {
       panel.dispose();
