@@ -112,6 +112,11 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       updateStatusLine();
       return;
     }
+    if (e.key === 'c' && !inDiff) {
+      e.preventDefault();
+      vscode.postMessage({ command: 'switchTheme' });
+      return;
+    }
     if (e.key === 'Enter' && selectedRow) {
       e.preventDefault();
       const dv = document.getElementById('diff-view') as HTMLElement | null;
@@ -129,7 +134,14 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
   });
 
   window.addEventListener('message', (event: MessageEvent) => {
-    const msg = event.data as { command: string; diff?: string; filePath?: string; title?: string };
+    const msg = event.data as { command: string; diff?: string; filePath?: string; title?: string; css?: string; name?: string };
+    if (msg.command === 'updateTheme') {
+      const el = document.getElementById('sgv-theme');
+      if (el) { el.textContent = msg.css as string; }
+      const badge = document.getElementById('theme-name');
+      if (badge) { badge.textContent = msg.name as string; }
+      return;
+    }
     if (msg.command === 'renderDiff') {
       const container = document.getElementById('diff-view');
       if (!container) { return; }

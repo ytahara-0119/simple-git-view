@@ -90,6 +90,12 @@ declare function acquireVsCodeApi(): {
       return;
     }
 
+    if (e.key === 'c' && !inFileList && !inDiff) {
+      e.preventDefault();
+      vscode.postMessage({ command: 'switchTheme' });
+      return;
+    }
+
     if (!inFileList) {
       // Commit list navigation
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -133,7 +139,15 @@ declare function acquireVsCodeApi(): {
   });
 
   window.addEventListener('message', (event: MessageEvent) => {
-    const msg = event.data as { command: string; files?: string[]; hash?: string; diff?: string; filePath?: string };
+    const msg = event.data as { command: string; files?: string[]; hash?: string; diff?: string; filePath?: string; css?: string; name?: string };
+
+    if (msg.command === 'updateTheme') {
+      const el = document.getElementById('sgv-theme');
+      if (el) { el.textContent = msg.css as string; }
+      const badge = document.getElementById('theme-name');
+      if (badge) { badge.textContent = msg.name as string; }
+      return;
+    }
 
     if (msg.command === 'renderFiles') {
       const container = document.getElementById('file-list');
