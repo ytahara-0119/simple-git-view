@@ -145,7 +145,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴 <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span></div>
   <div class="panel-section">
     <p class="hint commit-hint">
-      <kbd>↑↓</kbd> 移動 ·
+      <kbd>↑↓</kbd><kbd>jk</kbd> 移動 ·
       <kbd>Space</kbd> マーク ·
       <kbd>Enter</kbd> diff へ ·
       <kbd>m</kbd> マージ表示 ·
@@ -347,7 +347,7 @@ export class HistoryPanel {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <p class="hint commit-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>c</kbd> テーマ</p>
+    <p class="hint commit-hint"><kbd>↑↓</kbd><kbd>jk</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>c</kbd> テーマ</p>
     <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
   </div>
   <div class="panel-section">

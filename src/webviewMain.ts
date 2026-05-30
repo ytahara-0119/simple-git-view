@@ -63,8 +63,8 @@ declare function acquireVsCodeApi(): {
     const inDiff = active && (active as HTMLElement).id === 'diff-view';
 
     if (inDiff) {
-      if (e.key === 'ArrowDown') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
-      if (e.key === 'ArrowUp')   { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
+      if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
+      if (e.key === 'ArrowUp'   || e.key === 'k') { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
       if (e.key === 'PageDown')  { e.preventDefault(); window.scrollBy({ top: window.innerHeight * 0.8 }); return; }
       if (e.key === 'PageUp')    { e.preventDefault(); window.scrollBy({ top: -window.innerHeight * 0.8 }); return; }
       if (e.key === 'Escape') {
@@ -98,12 +98,12 @@ declare function acquireVsCodeApi(): {
 
     if (!inFileList) {
       // Commit list navigation
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'ArrowUp' || e.key === 'k') {
         e.preventDefault();
         const rows = visibleRows();
         if (rows.length === 0) { return; }
         const idx = selectedCommitRow ? rows.indexOf(selectedCommitRow as HTMLElement) : -1;
-        let next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+        let next = (e.key === 'ArrowDown' || e.key === 'j') ? idx + 1 : idx - 1;
         next = Math.max(0, Math.min(rows.length - 1, next));
         selectCommitRow(rows[next]);
         rows[next].scrollIntoView({ block: 'nearest' });
@@ -206,11 +206,11 @@ declare function acquireVsCodeApi(): {
               (selectedCommitRow as HTMLElement).scrollIntoView({ block: 'nearest' });
             }
           }
-          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'ArrowUp' || e.key === 'k') {
             e.preventDefault();
             const items = Array.from(ul.querySelectorAll('li')) as HTMLElement[];
             const idx = items.indexOf(li);
-            const next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+            const next = (e.key === 'ArrowDown' || e.key === 'j') ? idx + 1 : idx - 1;
             if (next >= 0 && next < items.length) {
               items[next].focus();
               items[next].scrollIntoView({ block: 'nearest' });

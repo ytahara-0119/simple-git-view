@@ -60,8 +60,8 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
     const inDiff = active && active.id === 'diff-view';
 
     if (inDiff) {
-      if (e.key === 'ArrowDown') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
-      if (e.key === 'ArrowUp')   { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
+      if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
+      if (e.key === 'ArrowUp'   || e.key === 'k') { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
       if (e.key === 'PageDown')  { e.preventDefault(); window.scrollBy({ top: window.innerHeight * 0.8 }); return; }
       if (e.key === 'PageUp')    { e.preventDefault(); window.scrollBy({ top: -window.innerHeight * 0.8 }); return; }
       if (e.key === 'Escape') {
@@ -123,11 +123,11 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       if (dv) { dv.focus(); dv.scrollIntoView({ block: 'start' }); }
       return;
     }
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'ArrowUp' || e.key === 'k') {
       e.preventDefault();
       const rows = visibleRows();
       const idx = selectedRow ? rows.indexOf(selectedRow) : -1;
-      let next = e.key === 'ArrowDown' ? idx + 1 : idx - 1;
+      let next = (e.key === 'ArrowDown' || e.key === 'j') ? idx + 1 : idx - 1;
       next = Math.max(0, Math.min(rows.length - 1, next));
       selectRow(rows[next]);
     }
