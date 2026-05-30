@@ -1,0 +1,7 @@
+{
+  "name": "Simple Git View UI",
+  "id": "1234567890123456789",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma","dev"]
+}
