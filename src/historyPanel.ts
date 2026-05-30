@@ -186,6 +186,15 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   });
 
   fileHistoryPanels.set(filePath, panel);
+  panel.onDidChangeViewState(e => {
+    if (e.webviewPanel.visible) {
+      panel.webview.postMessage({
+        command: 'updateTheme',
+        css: buildRootCss(allThemes[currentThemeIdx].vars),
+        name: allThemes[currentThemeIdx].name,
+      });
+    }
+  });
   panel.onDidDispose(() => {
     fileHistoryPanels.delete(filePath);
   });
@@ -239,6 +248,15 @@ export class HistoryPanel {
     this.extensionUri = extensionUri;
     this.panel.webview.html = this.getHtml();
     this.panel.webview.onDidReceiveMessage(msg => this.handleMessage(msg));
+    this.panel.onDidChangeViewState(e => {
+      if (e.webviewPanel.visible) {
+        this.panel.webview.postMessage({
+          command: 'updateTheme',
+          css: buildRootCss(allThemes[currentThemeIdx].vars),
+          name: allThemes[currentThemeIdx].name,
+        });
+      }
+    });
     this.panel.onDidDispose(() => {
       HistoryPanel.currentPanel = undefined;
     });
