@@ -1,0 +1,16 @@
+{
+  "schema": "simple-git-view.theme.v1",
+  "name": "Morphous Scallop",
+  "colors": {
+    "primary": "#F56A61",
+    "accent": "#8ED8DE",
+    "signal": "#FFCBA8",
+    "destructive": "#ff2056",
+    "background": "#FFF9F2",
+    "surface": "#FEFDFC",
+    "muted": "#F3E6D2",
+    "border": "#E5D8CE",
+    "depth": "#10222A",
+    "ink": "#2B3A42"
+  }
+}

@@ -78,10 +78,11 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | コミット一覧を移動 |
+| ↑ / ↓ / j / k | コミット一覧を移動 |
 | Enter | 変更ファイル一覧の先頭へフォーカス |
 | Space | 現在のコミットをマーク（2コミット間 diff の基点を設定、再押下で解除） |
 | m | マージコミット表示トグル（デフォルト非表示） |
+| c | テーマを切り替える |
 
 ---
 
@@ -100,7 +101,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | ファイルを移動し diff を更新 |
+| ↑ / ↓ / j / k | ファイルを移動し diff を更新 |
 | Enter | diff スクロールモードへ |
 | h | 選択ファイルの履歴パネルを開く |
 | Escape | コミット一覧に戻る |
@@ -110,7 +111,7 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 変更ファイル一覧またはファイル履歴パネルで Enter を押すと、diff 表示領域にフォーカスが移り「diff スクロールモード」に入る。
 
 - フォーカス時は diff 領域に薄い枠線を表示
-- `↑` / `↓`: 40px スクロール
+- `↑` / `↓` / `j` / `k`: 40px スクロール
 - `PageUp` / `PageDown`: 約 80%（ページ単位）スクロール
 - `Escape`: 元の一覧（変更ファイル一覧 / ファイル履歴一覧）にフォーカスを戻す
 
@@ -127,10 +128,11 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | コミットを移動し diff を更新 |
+| ↑ / ↓ / j / k | コミットを移動し diff を更新 |
 | Space | 現在のコミットをマーク（2コミット間 diff の基点を設定、再押下で解除） |
 | Enter | diff スクロールモードへ |
 | m | マージコミット表示トグル |
+| c | テーマを切り替える |
 | q | パネルを閉じる（メインのコミット履歴パネルにフォーカスを戻す） |
 
 diff スクロールモードの挙動はセクション 3 と同一。
@@ -170,6 +172,16 @@ StatusBar [$(git-branch) main]
 
 ---
 
+### 6. カスタムテーマ
+
+- デフォルトテーマとして `Figma Pink`（コミット履歴）と `File History Blue`（ファイル履歴）の 2 種を内蔵
+- ワークスペースの `.simple-git-view/themes/` フォルダ内の `*.sgv-theme.json` を起動時に自動読み込み
+- `c` キーで次のテーマに切り替え（コミット履歴・ファイル履歴パネル間で同期）
+- テーマ JSON スキーマ: `simple-git-view.theme.v1`（`scripts/README.md` 参照）
+- Webview 再表示時にも現在テーマを維持（`onDidChangeViewState` で再送信）
+
+---
+
 ## エラー UX
 
 - git コマンド失敗時は VSCode の Output channel `Simple Git View` にエラー詳細を出力する
@@ -183,11 +195,14 @@ StatusBar [$(git-branch) main]
 simple-git-view/
 ├── package.json
 ├── tsconfig.json
+├── .simple-git-view/
+│   └── themes/               # カスタムテーマ JSON（*.sgv-theme.json）を配置
 └── src/
     ├── extension.ts          # エントリポイント・コマンド登録
     ├── gitService.ts         # git コマンド実行・データ取得・Output channel
     ├── statusBarItem.ts      # StatusBar ブランチ表示
-    ├── historyPanel.ts       # コミット履歴 Webview パネル（ホスト側）
+    ├── historyPanel.ts       # コミット履歴 Webview パネル（ホスト側）+ ファイル履歴パネル
+    ├── themeLoader.ts        # テーマ定義・JSON 読み込み・CSS 変数生成
     ├── webviewMain.ts        # コミット履歴パネルのブラウザ側スクリプト
     ├── fileHistoryMain.ts    # ファイル履歴パネルのブラウザ側スクリプト
     └── blameDecoration.ts    # Blame ゴーストテキスト

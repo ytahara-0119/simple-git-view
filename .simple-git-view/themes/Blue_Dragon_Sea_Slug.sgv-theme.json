@@ -1,0 +1,16 @@
+{
+  "schema": "simple-git-view.theme.v1",
+  "name": "Morphous Blue Dragon Sea Slug",
+  "colors": {
+    "primary": "#1267D8",
+    "accent": "#24D8FF",
+    "signal": "#ff637e",
+    "destructive": "#ff2056",
+    "background": "#F6FBFF",
+    "surface": "#C9D8E6",
+    "muted": "#E6F0F7",
+    "border": "#f3e8ff",
+    "depth": "#364153",
+    "ink": "#071A2B"
+  }
+}

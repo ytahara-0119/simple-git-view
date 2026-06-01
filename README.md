@@ -38,16 +38,17 @@ code --install-extension simple-git-view-0.0.1.vsix --force
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | コミット一覧を移動 |
+| ↑ / ↓ / j / k | コミット一覧を移動 |
 | Enter | 変更ファイル一覧にフォーカス |
+| Space | コミットをマーク（再押下で解除）— 2コミット間 diff の基点 |
 | m | マージコミット表示トグル（デフォルト非表示） |
-| Esc | 上位の領域にフォーカス |
+| c | テーマを切り替える |
 
 #### 変更ファイル一覧
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | ファイルを移動し diff を更新 |
+| ↑ / ↓ / j / k | ファイルを移動し diff を更新 |
 | Enter | diff スクロールモードへ |
 | h | 選択ファイルの履歴を新規パネルで開く |
 | Esc | コミット一覧に戻る |
@@ -56,7 +57,7 @@ code --install-extension simple-git-view-0.0.1.vsix --force
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | 40px スクロール |
+| ↑ / ↓ / j / k | 40px スクロール |
 | PageUp / PageDown | 約 80% スクロール |
 | Esc | 元の一覧（ファイル / コミット）に戻る |
 
@@ -66,9 +67,11 @@ code --install-extension simple-git-view-0.0.1.vsix --force
 
 | キー | 動作 |
 |---|---|
-| ↑ / ↓ | コミットを移動し diff を更新 |
+| ↑ / ↓ / j / k | コミットを移動し diff を更新 |
 | Enter | diff スクロールモードへ |
+| Space | コミットをマーク（再押下で解除）— 2コミット間 diff の基点 |
 | m | マージコミット表示トグル |
+| c | テーマを切り替える |
 | q | パネルを閉じる（メインのコミット履歴に戻る） |
 
 ## コマンド一覧
@@ -77,6 +80,20 @@ code --install-extension simple-git-view-0.0.1.vsix --force
 |---|---|
 | `Git View: Show Commit History` | コミット履歴 Webview を開く |
 | `Git View: Show File History` | アクティブエディタのファイル履歴を開く |
+
+## テーマカスタマイズ
+
+ワークスペースの `.simple-git-view/themes/` フォルダに `*.sgv-theme.json` ファイルを配置すると、パネル起動時にカスタムテーマが読み込まれ `c` キーで切り替えられます。
+
+テーマファイルは [Morphous](https://morphous.app/) 形式から変換できます：
+
+```bash
+node scripts/morphous-to-sgv-theme.js path/to/morphous-theme.json
+mkdir -p .simple-git-view/themes
+cp path/to/generated.sgv-theme.json .simple-git-view/themes/
+```
+
+詳細は `scripts/README.md` を参照。
 
 ## 設計原則
 
