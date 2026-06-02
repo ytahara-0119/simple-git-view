@@ -1,31 +1,28 @@
-# Dependency Review
+# Dependency Review Skill
 
-目的:
-依存ライブラリの健全性を確認する
+依存ライブラリの健全性を確認するスキル。
 
-チェック項目:
+## 実行手順
 
-- 更新頻度
-- メンテナ状況
-- Issue数
-- Star数
-- アーカイブ済みか
-- Critical CVE
-- High CVE
+1. `npm audit` で CVE を確認する
+2. `npm outdated` でバージョン状況を確認する
+3. `package.json` の直接依存を `npm info` で調査する
 
-対応言語:
+## チェック項目
 
-- npm
-- pnpm
-- yarn
-- pip
-- cargo
-- go
+- Critical / High CVE の有無
+- メンテナが活発か（アーカイブ済みでないか）
+- 最終リリースが極端に古くないか（1年以上更新なし = 要注意）
+- Star数・Issue数（目安として参照）
 
-結果は
+## 対応パッケージマネージャー
 
-- 問題なし
-- 要注意
-- 置換推奨
+npm / pnpm / yarn / pip / cargo / go
 
-に分類する
+## 結果分類
+
+| 判定 | 基準 |
+|------|------|
+| 問題なし | CVEなし・活発にメンテナンス中 |
+| 要注意 | Moderate CVEあり、または更新が止まっている |
+| 置換推奨 | High/Critical CVEあり、またはアーカイブ済み |
