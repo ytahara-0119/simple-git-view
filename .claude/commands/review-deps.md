@@ -1,0 +1,2 @@
+dependency-review skill を使って
+依存ライブラリを確認してください
