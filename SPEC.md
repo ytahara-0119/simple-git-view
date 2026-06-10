@@ -46,9 +46,9 @@ VSCode 拡張機能。git リポジトリの状態・履歴・差分を**見る�
 ### 1. StatusBar ブランチ表示
 
 - VSCode 画面下部の StatusBar 右側に常時表示
-- 表示内容: `$(git-branch) <ブランチ名>`
+- 表示内容: `🌸 <ブランチ名>`
 - クリック → コミット履歴 Webview を開く（`simpleGitView.showHistory` を実行）
-- tooltip: `Simple Git View: Show Commit History`
+- tooltip: Markdown 形式で **Simple Git View** + 「Click: Show commit history」+「`⌘⇧P` → `Git View` for all commands」を表示
 - 更新タイミング:
   - 拡張機能 activate 時
   - `.git/HEAD` の変更を検出したとき（`FileSystemWatcher` で監視）
@@ -175,7 +175,7 @@ StatusBar [$(git-branch) main]
 ### 6. カスタムテーマ
 
 - デフォルトテーマとして `Figma Pink`（コミット履歴）と `File History Blue`（ファイル履歴）の 2 種を内蔵
-- ワークスペースの `.simple-git-view/themes/` フォルダ内の `*.sgv-theme.json` を起動時に自動読み込み
+- ワークスペースの `.simple-git-view/themes/` フォルダ内の `*.json` ファイルを起動時に自動読み込み（`schema: "simple-git-view.theme.v1"` フィールドを持つもののみ有効）
 - `c` キーで次のテーマに切り替え（コミット履歴・ファイル履歴パネル間で同期）
 - テーマ JSON スキーマ: `simple-git-view.theme.v1`（`scripts/README.md` 参照）
 - Webview 再表示時にも現在テーマを維持（`onDidChangeViewState` で再送信）

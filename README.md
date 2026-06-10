@@ -23,11 +23,29 @@ npx vsce package
 code --install-extension simple-git-view-0.0.1.vsix --force
 ```
 
+## アップデート（ローカル再インストール）
+
+最新コードを取り込んで拡張機能を更新する場合、以下のコマンドを一発で実行する。
+
+```bash
+cd /path/to/simple-git-view && git checkout main && git pull && npm run compile && npx vsce package && code --install-extension simple-git-view-0.0.1.vsix --force
+```
+
+| ステップ | 内容 |
+|---|---|
+| `git checkout main` | main ブランチに切り替え |
+| `git pull` | リモートの最新コードを取得 |
+| `npm run compile` | TypeScript をコンパイル |
+| `npx vsce package` | `.vsix` パッケージを生成 |
+| `code --install-extension ... --force` | VS Code に強制上書きインストール |
+
+インストール後に VS Code を再読み込み（`Developer: Reload Window`）すると新バージョンが反映される。
+
 ## 使い方
 
 ### 起動方法
 
-- StatusBar 右側の `$(git-branch) <branch>` をクリック
+- StatusBar 右側の `🌸 <branch>` をクリック
 - コマンドパレット → `Git View: Show Commit History`
 - 現在編集中のファイルの履歴: `Git View: Show File History`
   （エディタタイトルメニュー / エディタ右クリックメニューからも起動可能）
@@ -83,7 +101,8 @@ code --install-extension simple-git-view-0.0.1.vsix --force
 
 ## テーマカスタマイズ
 
-ワークスペースの `.simple-git-view/themes/` フォルダに `*.sgv-theme.json` ファイルを配置すると、パネル起動時にカスタムテーマが読み込まれ `c` キーで切り替えられます。
+ワークスペースの `.simple-git-view/themes/` フォルダに `.json` ファイルを配置すると、パネル起動時にカスタムテーマが読み込まれ `c` キーで切り替えられます。  
+ファイルには `"schema": "simple-git-view.theme.v1"` フィールドが必要です（このフィールドを持たない JSON は無視されます）。
 
 テーマファイルは [Morphous](https://morphous.app/) 形式から変換できます：
 
