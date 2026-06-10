@@ -17,6 +17,7 @@ export interface Commit {
   insertions: number;
   deletions: number;
   isMerge: boolean;
+  cherryPickedFrom?: string;
 }
 
 export interface BlameLine {
@@ -74,7 +75,7 @@ export function getCommitLog(cwd: string): Commit[] {
       '--max-count=50',
       '--shortstat',
       '--date=format:%Y-%m-%d %H:%M',
-      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P',
+      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P%x1F%b',
     ]);
     return parseCommitLog(output);
   } catch (err) {
@@ -82,6 +83,8 @@ export function getCommitLog(cwd: string): Commit[] {
     return [];
   }
 }
+
+const CHERRY_PICK_RE = /\(cherry picked from commit ([0-9a-f]+)\)/;
 
 function parseCommitLog(output: string): Commit[] {
   const commits: Commit[] = [];
@@ -91,6 +94,8 @@ function parseCommitLog(output: string): Commit[] {
       if (current) { commits.push(current); }
       const parts = line.split('\x1F');
       const parents = (parts[4] ?? '').trim();
+      const bodyFragment = (parts[5] ?? '').trim();
+      const cherryMatch = bodyFragment.match(CHERRY_PICK_RE);
       current = {
         hash: parts[0] ?? '',
         message: parts[1] ?? '',
@@ -99,8 +104,13 @@ function parseCommitLog(output: string): Commit[] {
         insertions: 0,
         deletions: 0,
         isMerge: parents.includes(' '),
+        cherryPickedFrom: cherryMatch ? cherryMatch[1] : undefined,
       };
       continue;
+    }
+    if (current && !current.cherryPickedFrom) {
+      const cherryMatch = line.match(CHERRY_PICK_RE);
+      if (cherryMatch) { current.cherryPickedFrom = cherryMatch[1]; }
     }
     if (current && /insertions?\(\+\)|deletions?\(-\)/.test(line)) {
       const ins = line.match(/(\d+)\s+insertions?\(\+\)/);
@@ -132,7 +142,7 @@ export function getFileLog(cwd: string, filePath: string): Commit[] {
       '--max-count=50',
       '--shortstat',
       '--date=format:%Y-%m-%d %H:%M',
-      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P',
+      '--format=%H%x1F%s%x1F%an%x1F%ad%x1F%P%x1F%b',
       '--',
       filePath,
     ]);

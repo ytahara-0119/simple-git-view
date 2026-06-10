@@ -1,0 +1,16 @@
+{
+  "schema": "simple-git-view.theme.v1",
+  "name": "Morphous Starfruit",
+  "colors": {
+    "primary": "#FFD21A",
+    "accent": "#B6E100",
+    "signal": "#2E7D32",
+    "destructive": "#ff2056",
+    "background": "#fff8c9",
+    "surface": "#fffde8",
+    "muted": "#687A71",
+    "border": "#f3e8ff",
+    "depth": "#164B2A",
+    "ink": "#1A1F18"
+  }
+}

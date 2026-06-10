@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getCommitLog, getCommitFiles, getFileLog, getFileDiff, getTotalCommitCount, getCommitRangeFiles, getCommitRangeDiff } from './gitService';
+import { getCommitLog, getCommitFiles, getFileLog, getFileDiff, getTotalCommitCount, getCommitRangeFiles, getCommitRangeDiff, getCurrentBranch } from './gitService';
 import { ThemeEntry, DEFAULT_FIGMA_THEME, DEFAULT_FILE_HISTORY_THEME, buildRootCss, loadThemesFromFolder } from './themeLoader';
 
 function getNonce(): string {
@@ -23,8 +23,9 @@ function escapeHtml(s: string): string {
 // Shared CSS using CSS variables (--sgv-*) for theming
 const SHARED_STYLE = `
     body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:var(--sgv-text);background:linear-gradient(142deg,var(--sgv-bg1) 0%,var(--sgv-bg2) 100%);margin:0;padding:0; }
-    .tab-bar { background:linear-gradient(to right,var(--sgv-tab1),var(--sgv-tab2),var(--sgv-tab3));color:#ffffff;padding:12px 24px;font-size:14px;font-weight:600;box-shadow:0 10px 8px -6px rgba(0,0,0,0.1); }
+    .tab-bar { display:flex;align-items:center;background:linear-gradient(to right,var(--sgv-tab1),var(--sgv-tab2),var(--sgv-tab3));color:#ffffff;padding:12px 24px;font-size:14px;font-weight:600;box-shadow:0 10px 8px -6px rgba(0,0,0,0.1); }
     .theme-badge { font-size:0.75em;font-weight:400;opacity:0.9;margin-left:12px;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,0.25); }
+    .branch-badge { font-size:0.8em;font-weight:500;margin-left:auto;padding:2px 12px;border-radius:999px;background:rgba(255,255,255,0.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%; }
     .panel-section { padding:16px 24px; }
     table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
     table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
@@ -32,7 +33,7 @@ const SHARED_STYLE = `
     table.commit-table tbody { max-height:280px;overflow-y:auto; }
     table.commit-table thead tr { background:linear-gradient(to right,var(--sgv-th1),var(--sgv-th2));color:var(--sgv-th-text); }
     table.commit-table th, table.commit-table td { padding:6px 8px;text-align:left;border-bottom:1px solid var(--sgv-row-border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-    table.commit-table .col-hash { width:80px;font-family:monospace;color:var(--sgv-hash); }
+    table.commit-table .col-hash { width:210px;font-family:monospace;color:var(--sgv-hash); }
     table.commit-table .col-msg { width:auto;white-space:nowrap;color:var(--sgv-text); }
     table.commit-table .col-stat { width:90px;font-family:monospace; }
     table.commit-table .ins { color:var(--sgv-ins);font-weight:bold; }
@@ -99,6 +100,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   }
   const commits = getFileLog(cwd, filePath);
   const totalCount = getTotalCommitCount(cwd, filePath);
+  const branch = getCurrentBranch(cwd);
   const fileNonce = getNonce();
   const panel = vscode.window.createWebviewPanel(
     'simpleGitViewFileHistory',
@@ -117,6 +119,8 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   const rows = commits.map(c => {
     const hash = escapeHtml(c.hash);
     const shortHash = escapeHtml(c.hash.slice(0, 7));
+    const cherryFrom = c.cherryPickedFrom ? escapeHtml(c.cherryPickedFrom.slice(0, 7)) : null;
+    const hashDisplay = cherryFrom ? `🍒${cherryFrom}→${shortHash}` : shortHash;
     const message = escapeHtml(c.message);
     const author = escapeHtml(c.author);
     const date = escapeHtml(c.date);
@@ -124,7 +128,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     const del = c.deletions;
     const cls = c.isMerge ? 'is-merge' : '';
     return `<tr class="${cls}" data-hash="${hash}" data-filepath="${escapeHtml(filePath)}" tabindex="-1" style="cursor:pointer;">
-      <td class="col-hash">${shortHash}</td>
+      <td class="col-hash">${hashDisplay}</td>
       <td class="col-msg">${message}</td>
       <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
       <td class="col-author">${author}</td>
@@ -142,7 +146,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
   <style>${SHARED_STYLE}</style>
 </head>
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
-  <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴 <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span></div>
+  <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴 <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span><span class="branch-badge" title="${escapeHtml(branch)}">⎇ ${escapeHtml(branch)}</span></div>
   <div class="panel-section">
     <p class="hint commit-hint">
       <kbd>↑↓</kbd><kbd>jk</kbd> 移動 ·
@@ -215,13 +219,10 @@ export class HistoryPanel {
   }
 
   static show(cwd: string, context: vscode.ExtensionContext): void {
-    // Load themes from workspace folder (pick up latest)
-    const wsFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (wsFolder) {
-      const themesDir = path.join(wsFolder, '.simple-git-view', 'themes');
-      const loaded = loadThemesFromFolder(themesDir);
-      allThemes = [DEFAULT_FIGMA_THEME, DEFAULT_FILE_HISTORY_THEME, ...loaded];
-    }
+    // Load themes bundled with the extension (available in every repository)
+    const themesDir = path.join(context.extensionUri.fsPath, 'themes');
+    const loaded = loadThemesFromFolder(themesDir);
+    allThemes = [DEFAULT_FIGMA_THEME, DEFAULT_FILE_HISTORY_THEME, ...loaded];
 
     if (HistoryPanel.currentPanel) {
       HistoryPanel.currentPanel.panel.reveal(vscode.ViewColumn.One);
@@ -307,11 +308,14 @@ export class HistoryPanel {
     );
     const commits = getCommitLog(this.cwd);
     const totalCount = getTotalCommitCount(this.cwd);
+    const branch = getCurrentBranch(this.cwd);
 
     const rows = commits
       .map(commit => {
         const hash = escapeHtml(commit.hash);
         const shortHash = escapeHtml(commit.hash.slice(0, 7));
+        const cherryFrom = commit.cherryPickedFrom ? escapeHtml(commit.cherryPickedFrom.slice(0, 7)) : null;
+        const hashDisplay = cherryFrom ? `🍒${cherryFrom}→${shortHash}` : shortHash;
         const message = escapeHtml(commit.message);
         const author = escapeHtml(commit.author);
         const date = escapeHtml(commit.date);
@@ -319,7 +323,7 @@ export class HistoryPanel {
         const del = commit.deletions;
         const cls = commit.isMerge ? 'is-merge' : '';
         return `<tr class="${cls}" data-hash="${hash}" tabindex="-1" style="cursor:pointer;">
-          <td class="col-hash">${shortHash}</td>
+          <td class="col-hash">${hashDisplay}</td>
           <td class="col-msg">${message}</td>
           <td class="col-stat"><span class="ins">+${ins}</span><span class="del">-${del}</span></td>
           <td class="col-author">${author}</td>
@@ -339,7 +343,7 @@ export class HistoryPanel {
   <style>${SHARED_STYLE}</style>
 </head>
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
-  <div class="tab-bar">✨ Git History <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span></div>
+  <div class="tab-bar">✨ Git History <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span><span class="branch-badge" title="${escapeHtml(branch)}">⎇ ${escapeHtml(branch)}</span></div>
   <div class="panel-section">
     <table class="commit-table">
       <thead>

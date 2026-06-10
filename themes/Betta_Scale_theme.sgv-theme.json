@@ -1,0 +1,16 @@
+{
+  "schema": "simple-git-view.theme.v1",
+  "name": "Morphous Betta Scale",
+  "colors": {
+    "primary": "#0EA7A6",
+    "accent": "#7861FF",
+    "signal": "#4361EE",
+    "destructive": "#D7263D",
+    "background": "#F7FAFF",
+    "surface": "#F3F6FA",
+    "muted": "#D8E7F1",
+    "border": "#B9CCD7",
+    "depth": "#282F36",
+    "ink": "#080F14"
+  }
+}
