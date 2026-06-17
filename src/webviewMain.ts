@@ -313,6 +313,22 @@ declare function acquireVsCodeApi(): {
     return '<div class="split-diff">' + rows.join('') + '</div>';
   }
 
+  // Intercept wheel events to prevent VSCode webview outer scroll,
+  // and redirect to the nearest inner scrollable element instead.
+  window.addEventListener('wheel', (e: WheelEvent) => {
+    e.preventDefault();
+    let el = e.target as HTMLElement | null;
+    while (el) {
+      const style = window.getComputedStyle(el);
+      const oy = style.overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) {
+        el.scrollBy({ top: e.deltaY, left: e.deltaX });
+        return;
+      }
+      el = el.parentElement;
+    }
+  }, { passive: false });
+
   // Auto-select first visible commit row after listeners are registered
   if (tbody) {
     const firstRow = visibleRows()[0];
