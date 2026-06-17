@@ -22,11 +22,16 @@ function escapeHtml(s: string): string {
 
 // Shared CSS using CSS variables (--sgv-*) for theming
 const SHARED_STYLE = `
-    body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:var(--sgv-text);background:linear-gradient(142deg,var(--sgv-bg1) 0%,var(--sgv-bg2) 100%);margin:0;padding:0; }
+    html,body { height:100%; }
+    body { font-family:var(--vscode-font-family);font-size:var(--vscode-font-size);color:var(--sgv-text);background:linear-gradient(142deg,var(--sgv-bg1) 0%,var(--sgv-bg2) 100%);margin:0;padding:0;overflow:hidden;display:flex;flex-direction:column; }
     .tab-bar { display:flex;align-items:center;background:linear-gradient(to right,var(--sgv-tab1),var(--sgv-tab2),var(--sgv-tab3));color:#ffffff;padding:12px 24px;font-size:14px;font-weight:600;box-shadow:0 10px 8px -6px rgba(0,0,0,0.1); }
     .theme-badge { font-size:0.75em;font-weight:400;opacity:0.9;margin-left:12px;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,0.25); }
     .branch-badge { font-size:0.8em;font-weight:500;margin-left:auto;padding:2px 12px;border-radius:999px;background:rgba(255,255,255,0.25);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40%; }
     .panel-section { padding:16px 24px; }
+    .main-layout { flex:1;display:flex;overflow:hidden; }
+    .left-pane { width:20%;min-width:120px;overflow-y:auto;padding:12px;border-right:1px solid rgba(128,128,128,0.2);box-sizing:border-box; }
+    .right-pane { flex:1;display:flex;flex-direction:column;overflow:hidden; }
+    .right-top { flex:0 0 auto;border-bottom:1px solid rgba(128,128,128,0.2); }
     table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
     table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
     table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
@@ -49,7 +54,7 @@ const SHARED_STYLE = `
     #file-list { margin-top:4px; }
     #file-list h3 { margin:0 0 8px 0;font-size:var(--vscode-font-size);color:var(--sgv-text); }
     #file-list ul { margin:0;padding-left:0;display:flex;flex-direction:column;gap:6px; }
-    #file-list li { font-family:monospace;padding:8px 16px;cursor:pointer;outline:none;list-style:none;border-radius:14px;background:rgba(255,255,255,0.6);color:var(--sgv-text);font-size:14px; }
+    #file-list li { font-family:monospace;padding:6px 10px;cursor:pointer;outline:none;list-style:none;border-radius:14px;background:rgba(255,255,255,0.6);color:var(--sgv-text);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
     #file-list li:hover { background:rgba(255,255,255,0.85); }
     #file-list li.selected { background:linear-gradient(to right,var(--sgv-fsel1),var(--sgv-fsel2));color:var(--sgv-text);font-weight:600;box-shadow:0 4px 3px rgba(0,0,0,0.1); }
     #file-list li:focus { background:rgba(255,255,255,0.85);outline:2px solid var(--sgv-focus);outline-offset:-2px; }
@@ -59,7 +64,7 @@ const SHARED_STYLE = `
     .file-hint { display:inline-flex;align-items:center;font-size:0.85em;color:var(--sgv-fhint-text);margin:8px 0 0 0;background:var(--sgv-fhint-bg);padding:4px 14px;border-radius:999px; }
     kbd { display:inline-block;padding:0 4px;font-size:0.85em;font-family:monospace;border:1px solid var(--sgv-kbd-border);border-radius:3px;background:var(--sgv-kbd-bg);color:var(--sgv-kbd-text); }
     .hint kbd { margin:0 2px; }
-    #diff-view { padding:0 24px 16px;outline:none; }
+    #diff-view { flex:1;overflow-y:auto;padding:0 24px 16px;outline:none; }
     #diff-view:focus { outline:2px solid var(--sgv-focus);outline-offset:-2px; }
     #diff-view h3 { background:linear-gradient(to right,var(--sgv-dh1),var(--sgv-dh2),var(--sgv-dh3));color:#ffffff;padding:10px 20px;font-size:14px;font-weight:600;margin:8px 0 0 0;box-shadow:0 4px 3px rgba(0,0,0,0.1),0 2px 2px rgba(0,0,0,0.1);border-radius:14px 14px 0 0; }
     .split-diff { font-family:monospace;font-size:1.15em;background:linear-gradient(170deg,var(--sgv-diff-bg1) 0%,var(--sgv-diff-bg2) 100%);border-radius:0 0 14px 14px;border:2px solid rgba(255,255,255,0.5);box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);overflow:hidden; }
@@ -344,21 +349,25 @@ export class HistoryPanel {
 </head>
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <div class="tab-bar">✨ Git History <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span><span class="branch-badge" title="${escapeHtml(branch)}">⎇ ${escapeHtml(branch)}</span></div>
-  <div class="panel-section">
-    <table class="commit-table">
-      <thead>
-        <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p class="hint commit-hint"><kbd>↑↓</kbd><kbd>jk</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>c</kbd> テーマ</p>
-    <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
+  <div class="main-layout">
+    <div class="left-pane">
+      <div id="file-list"></div>
+      <p class="file-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> diff · <kbd>h</kbd> ファイル履歴 · <kbd>Esc</kbd> コミット一覧へ</p>
+    </div>
+    <div class="right-pane">
+      <div class="right-top panel-section">
+        <table class="commit-table">
+          <thead>
+            <tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p class="hint commit-hint"><kbd>↑↓</kbd><kbd>jk</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>c</kbd> テーマ</p>
+        <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
+      </div>
+      <div id="diff-view" tabindex="0"></div>
+    </div>
   </div>
-  <div class="panel-section">
-    <div id="file-list"></div>
-    <p class="file-hint"><kbd>↑↓</kbd> 移動 · <kbd>Enter</kbd> diff · <kbd>h</kbd> ファイル履歴 · <kbd>Esc</kbd> コミット一覧へ</p>
-  </div>
-  <div id="diff-view" tabindex="0"></div>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
