@@ -35,7 +35,7 @@ const SHARED_STYLE = `
     table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
     table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
     table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
-    table.commit-table tbody { max-height:280px;overflow-y:auto; }
+    table.commit-table tbody { overflow-y:visible; }
     table.commit-table thead tr { background:linear-gradient(to right,var(--sgv-th1),var(--sgv-th2));color:var(--sgv-th-text); }
     table.commit-table th, table.commit-table td { padding:6px 8px;text-align:left;border-bottom:1px solid var(--sgv-row-border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
     table.commit-table .col-hash { width:210px;font-family:monospace;color:var(--sgv-hash); }
