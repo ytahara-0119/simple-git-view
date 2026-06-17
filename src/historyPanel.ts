@@ -152,22 +152,24 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
 </head>
 <body class="hide-merges" data-total-count="${totalCount}" data-shown-count="${commits.length}">
   <div class="tab-bar">📄 ${escapeHtml(filePath)} — 履歴 <span id="theme-name" class="theme-badge">${escapeHtml(allThemes[currentThemeIdx].name)}</span><span class="branch-badge" title="${escapeHtml(branch)}">⎇ ${escapeHtml(branch)}</span></div>
-  <div class="panel-section">
-    <p class="hint commit-hint">
-      <kbd>↑↓</kbd><kbd>jk</kbd> 移動 ·
-      <kbd>Space</kbd> マーク ·
-      <kbd>Enter</kbd> diff へ ·
-      <kbd>m</kbd> マージ表示 ·
-      <kbd>t</kbd> テーマ ·
-      <kbd>q</kbd> 閉じる
-    </p>
-    <table class="commit-table">
-      <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
+  <div class="right-pane">
+    <div class="right-top panel-section">
+      <p class="hint commit-hint">
+        <kbd>↑↓</kbd><kbd>jk</kbd> 移動 ·
+        <kbd>Space</kbd> マーク ·
+        <kbd>Enter</kbd> diff へ ·
+        <kbd>m</kbd> マージ表示 ·
+        <kbd>t</kbd> テーマ ·
+        <kbd>q</kbd> 閉じる
+      </p>
+      <table class="commit-table">
+        <thead><tr><th class="col-hash">ハッシュ</th><th class="col-msg">メッセージ</th><th class="col-stat">変更</th><th class="col-author">著者</th><th class="col-date">日時</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
+    </div>
+    <div id="diff-view" tabindex="0"></div>
   </div>
-  <div id="diff-view" tabindex="0"></div>
   <script nonce="${fileNonce}" src="${scriptUri}"></script>
 </body>
 </html>`;
