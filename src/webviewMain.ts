@@ -91,7 +91,7 @@ declare function acquireVsCodeApi(): {
       return;
     }
 
-    if (e.key === 'c' && !inFileList && !inDiff) {
+    if (e.key === 't' && !inFileList && !inDiff) {
       e.preventDefault();
       vscode.postMessage({ command: 'switchTheme' });
       return;

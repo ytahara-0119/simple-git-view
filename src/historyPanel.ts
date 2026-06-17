@@ -158,7 +158,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
       <kbd>Space</kbd> マーク ·
       <kbd>Enter</kbd> diff へ ·
       <kbd>m</kbd> マージ表示 ·
-      <kbd>c</kbd> テーマ ·
+      <kbd>t</kbd> テーマ ·
       <kbd>q</kbd> 閉じる
     </p>
     <table class="commit-table">
@@ -362,7 +362,7 @@ export class HistoryPanel {
           </thead>
           <tbody>${rows}</tbody>
         </table>
-        <p class="hint commit-hint"><kbd>↑↓</kbd><kbd>jk</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>c</kbd> テーマ</p>
+        <p class="hint commit-hint"><kbd>↑↓</kbd><kbd>jk</kbd> 移動 · <kbd>Enter</kbd> ファイル一覧へ · <kbd>Space</kbd> マーク · <kbd>m</kbd> マージ表示 · <kbd>t</kbd> テーマ</p>
         <p class="status-line"><span class="merge-status">Merges: hidden (m)</span> · <span class="commit-count">Showing ${commits.length} / total: ${totalCount}</span></p>
       </div>
       <div id="diff-view" tabindex="0"></div>
