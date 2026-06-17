@@ -150,6 +150,14 @@ declare function acquireVsCodeApi(): {
       return;
     }
 
+    if (msg.command === 'restoreFocus') {
+      if (selectedCommitRow) {
+        (selectedCommitRow as HTMLElement).focus();
+        (selectedCommitRow as HTMLElement).scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+
     if (msg.command === 'renderFiles') {
       const container = document.getElementById('file-list');
       const dv = document.getElementById('diff-view');
