@@ -156,7 +156,7 @@ declare function acquireVsCodeApi(): {
       if (dv) { dv.innerHTML = ''; }
       selectedFileItem = null;
       if (!container) { return; }
-      const shortHash = msg.hash ? msg.hash.slice(0, 7) : '';
+      const shortHash = msg.hash || '';
       if (!msg.files || msg.files.length === 0) {
         container.innerHTML = '<h3>変更ファイル (' + shortHash + ')</h3>'
           + '<p class="hint">'

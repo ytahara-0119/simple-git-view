@@ -271,7 +271,7 @@ export class HistoryPanel {
   private handleMessage(msg: { command: string; hash?: string; filePath?: string; fromHash?: string; toHash?: string }): void {
     if (msg.command === 'showFiles' && msg.hash) {
       const files = getCommitFiles(this.cwd, msg.hash);
-      this.panel.webview.postMessage({ command: 'renderFiles', files, hash: msg.hash });
+      this.panel.webview.postMessage({ command: 'renderFiles', files, hash: (msg.hash as string).slice(0, 7) });
     }
 
     if (msg.command === 'showFileDiff' && msg.hash && msg.filePath) {
@@ -288,7 +288,7 @@ export class HistoryPanel {
       this.panel.webview.postMessage({
         command: 'renderFiles',
         files,
-        hash: `${(msg.fromHash as string).slice(0, 7)}..${(msg.toHash as string).slice(0, 7)}`,
+        hash: `${(msg.fromHash as string).slice(0, 7)}→${(msg.toHash as string).slice(0, 7)}`,
         fromHash: msg.fromHash,
         toHash: msg.toHash,
       });
