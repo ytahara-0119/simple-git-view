@@ -112,7 +112,7 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       updateStatusLine();
       return;
     }
-    if (e.key === 'c' && !inDiff) {
+    if (e.key === 't' && !inDiff) {
       e.preventDefault();
       vscode.postMessage({ command: 'switchTheme' });
       return;
