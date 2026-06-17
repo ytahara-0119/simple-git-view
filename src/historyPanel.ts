@@ -31,7 +31,7 @@ const SHARED_STYLE = `
     .main-layout { flex:1;display:flex;overflow:hidden; }
     .left-pane { width:20%;min-width:120px;overflow-y:auto;padding:12px;border-right:1px solid rgba(128,128,128,0.2);box-sizing:border-box; }
     .right-pane { flex:1;display:flex;flex-direction:column;overflow:hidden; }
-    .right-top { flex:0 0 15%;overflow-y:auto;border-bottom:1px solid rgba(128,128,128,0.2); }
+    .right-top { flex:0 0 20%;overflow-y:auto;border-bottom:1px solid rgba(128,128,128,0.2); }
     table.commit-table { width:100%;border-collapse:collapse;table-layout:fixed;border-radius:16px;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -4px rgba(0,0,0,0.1); }
     table.commit-table thead, table.commit-table tbody { display:block;width:100%; }
     table.commit-table thead tr, table.commit-table tbody tr { display:table;width:100%;table-layout:fixed; }
