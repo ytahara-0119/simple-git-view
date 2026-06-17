@@ -290,7 +290,6 @@ declare function acquireVsCodeApi(): {
     for (const line of lines) {
       if (line.startsWith('diff ') || line.startsWith('index ') || line.startsWith('--- ') || line.startsWith('+++ ')) {
         flush();
-        rows.push('<div class="row meta"><div class="meta-content">' + escapeHtml(line) + '</div></div>');
       } else if (line.startsWith('@@')) {
         flush();
         const m = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
