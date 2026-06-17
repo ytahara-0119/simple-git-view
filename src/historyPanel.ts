@@ -193,6 +193,7 @@ export function openFileHistoryPanel(cwd: string, filePath: string, extensionUri
     if (msg.command === 'close') {
       panel.dispose();
       HistoryPanel.currentPanel?.reveal();
+      HistoryPanel.currentPanel?.panel.webview.postMessage({ command: 'restoreFocus' });
     }
   });
 

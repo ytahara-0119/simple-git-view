@@ -78,7 +78,7 @@ declare function acquireVsCodeApi(): { postMessage(msg: unknown): void; };
       return;
     }
 
-    if (e.key === 'q' && !isEditable) {
+    if ((e.key === 'q' || e.key === 'Escape') && !isEditable) {
       e.preventDefault();
       vscode.postMessage({ command: 'close' });
       return;
