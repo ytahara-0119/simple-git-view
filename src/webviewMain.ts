@@ -63,10 +63,11 @@ declare function acquireVsCodeApi(): {
     const inDiff = active && (active as HTMLElement).id === 'diff-view';
 
     if (inDiff) {
-      if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); window.scrollBy({ top: 40 }); return; }
-      if (e.key === 'ArrowUp'   || e.key === 'k') { e.preventDefault(); window.scrollBy({ top: -40 }); return; }
-      if (e.key === 'PageDown')  { e.preventDefault(); window.scrollBy({ top: window.innerHeight * 0.8 }); return; }
-      if (e.key === 'PageUp')    { e.preventDefault(); window.scrollBy({ top: -window.innerHeight * 0.8 }); return; }
+      const dv = document.getElementById('diff-view') as HTMLElement;
+      if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); dv.scrollBy({ top: 40 }); return; }
+      if (e.key === 'ArrowUp'   || e.key === 'k') { e.preventDefault(); dv.scrollBy({ top: -40 }); return; }
+      if (e.key === 'PageDown')  { e.preventDefault(); dv.scrollBy({ top: dv.clientHeight * 0.8 }); return; }
+      if (e.key === 'PageUp')    { e.preventDefault(); dv.scrollBy({ top: -dv.clientHeight * 0.8 }); return; }
       if (e.key === 'Escape') {
         e.preventDefault();
         if (selectedFileItem) { (selectedFileItem as HTMLElement).focus(); }
@@ -195,7 +196,7 @@ declare function acquireVsCodeApi(): {
           if (e.key === 'Enter') {
             e.preventDefault();
             const dv = document.getElementById('diff-view') as HTMLElement | null;
-            if (dv) { dv.focus(); dv.scrollIntoView({ block: 'start' }); }
+            if (dv) { dv.focus(); dv.scrollTop = 0; }
             return;
           }
           if (e.key === 'Escape') {
@@ -247,6 +248,7 @@ declare function acquireVsCodeApi(): {
         return;
       }
       container.innerHTML = '<h3>🔍 ' + escapeHtml(msg.filePath || '') + ' — diff</h3>' + renderSplitDiff(msg.diff);
+      container.scrollTop = 0;
     }
   });
 
